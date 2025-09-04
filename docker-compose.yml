@@ -1,0 +1,82 @@
+# Victoria Project - Docker Compose for Local Development & Production
+version: '3.8'
+
+services:
+  # Streamlit Dashboard Service
+  dashboard:
+    build: .
+    container_name: victoria-dashboard
+    user: root
+    ports:
+      - "8501:8501"
+    environment:
+      - SERVICE_NAME=dashboard
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+      - .:/app/data
+    command: >
+      bash -c "mkdir -p /app/data_writable && chmod 777 /app/data_writable && cp /app/data/*.csv /app/data_writable/ 2>/dev/null || true && cp /app/data/*.txt /app/data_writable/ 2>/dev/null || true && streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # FastAPI Server Service  
+  api:
+    build: .
+    container_name: victoria-api
+    user: "1000:1000"
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_NAME=api
+      - PYTHONPATH=/app
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DOCKER_ENV=true
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+      - .:/app/data
+    command: >
+      bash -c "mkdir -p /app/logs && chmod 777 /app/logs && mkdir -p /app/data_writable && chmod 777 /app/data_writable && mkdir -p /app/temp /app/temp/uploads /app/temp/processing /app/output /app/output/reports /app/output/profiles && chmod -R 777 /app/temp /app/output && cp /app/data/*.csv /app/data_writable/ 2>/dev/null || true && cp /app/data/*.txt /app/data_writable/ 2>/dev/null || true && uvicorn api.main:app --host 0.0.0.0 --port 8000 --log-level info"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (Optional - for production)
+  nginx:
+    image: nginx:alpine
+    container_name: victoria-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - dashboard
+      - api
+    restart: unless-stopped
+    profiles: ["production"]
+
+# Named volumes for persistence
+volumes:
+  victoria_data:
+    driver: local
+
+# Network configuration
+networks:
+  default:
+    name: victoria-network

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Psychometric Report - {{ person.person_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        img {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Psychometric Assessment Report</h1>
+
+    <div class="section">
+        <h2>Participant</h2>
+        <p><strong>ID:</strong> {{ person.person_id }}</p>
+        <p><strong>Overall Score:</strong> {{ person.overall_score }}</p>
+        {% if person.overall_percentile %}
+            <p><strong>Overall Percentile:</strong> {{ person.overall_percentile }}th</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Construct Scores</h2>
+        <table>
+            <tr>
+                <th>Construct</th>
+                <th>Score</th>
+                <th>Percentile</th>
+            </tr>
+            {% for c in person.construct_scores %}
+                <tr>
+                    <td>{{ c.construct_name }}</td>
+                    <td>{{ c.score }}</td>
+                    <td>{{ c.percentile if c.percentile is not none else "N/A" }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Cluster Assignment</h2>
+        <p><strong>Cluster:</strong> {{ cluster.cluster_label }}</p>
+        <p><strong>Cluster Size:</strong> {{ cluster.size }}</p>
+        <p><strong>Cluster Characteristics:</strong> {{ cluster.characteristics }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Narrative Insights</h2>
+        {% for section, text in narratives.items() %}
+            <h3>{{ section }}</h3>
+            <p>{{ text }}</p>
+        {% endfor %}
+    </div>
+
+    {% if visuals %}
+    <div class="section">
+        <h2>Visualizations</h2>
+        {% for title, html in visuals.items() %}
+            <h3>{{ title }}</h3>
+            {{ html | safe }}
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>

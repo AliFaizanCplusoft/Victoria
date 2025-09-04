@@ -1,0 +1,326 @@
+# ===========================================
+# Victoria Project - Professional .gitignore
+# ===========================================
+
+# ================================
+# SECURITY & SENSITIVE DATA (NEVER COMMIT)
+# ================================
+
+# Environment files with secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# API keys and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+credentials.json
+auth.json
+config.json
+
+# Database files that might contain sensitive data
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ================================
+# PERSONAL & SENSITIVE ASSESSMENT DATA
+# ================================
+
+# Raw assessment data files (contain PII)
+**/Assessment*.csv
+**/Raw*.csv
+**/Personal*.csv
+**/Participant*.csv
+**/Response*.csv
+responses-*.csv
+
+# Processed data that might contain identifiable information
+# (Allow corrected_processed_data.csv as it appears anonymized)
+**/processed_data_with_ids.csv
+**/individual_responses.csv
+**/personal_profiles.csv
+
+# Generated reports with personal information
+output/reports/
+output/profiles/
+**/individual_reports/
+**/personal_reports/
+
+# ================================
+# PYTHON ENVIRONMENT
+# ================================
+
+# Virtual environments
+.venv/
+.venv_new/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ================================
+# LOGS & TEMPORARY FILES
+# ================================
+
+# Log files
+*.log
+logs/
+*.log.*
+log/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+*_backup
+*_old
+
+# ================================
+# GENERATED OUTPUT FILES
+# ================================
+
+# Large generated files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+*.svg
+*.eps
+
+# HTML output files (keep templates, ignore generated)
+output/
+test_output/
+temp/
+
+# Generated data files
+processed_output*.txt
+*_output.txt
+*_results.csv
+*_analysis.csv
+
+# ================================
+# DEVELOPMENT TOOLS
+# ================================
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ================================
+# DEPENDENCIES & PACKAGES
+# ================================
+
+# Third-party libraries (should be in requirements.txt)
+RaschPy/
+node_modules/
+bower_components/
+
+# ================================
+# SPECIFIC TO VICTORIA PROJECT
+# ================================
+
+# Cleanup and analysis scripts (temporary)
+cleanup_script.py
+cleanup_log.txt
+analyze_*.py
+
+# Sample and test data files
+sample_data.*
+test_*.csv
+test_*.json
+
+# Image files (contain analysis results)
+image*.png
+*.png
+*.jpg
+
+# Installation scripts
+install_*.sh
+run_*.sh
+start_*.sh
+
+# ================================
+# DOCUMENTATION OVERRIDES
+# ================================
+
+# Too many documentation files - keep only essential ones
+FIXES_SUMMARY.md
+FIX_DEPENDENCIES.md
+IMPLEMENTATION_SUMMARY.md
+OPTIMIZATION_REPORT.md
+PDF_GENERATION_SOLUTION.md
+QUICK_START_GUIDE.md
+SETUP_GUIDE.md
+dashboard_documentation.md
+
+# ================================
+# ALLOWED FILES (EXPLICITLY INCLUDE)
+# ================================
+
+# Essential configuration
+!requirements.txt
+!requirements_basic.txt
+!requirements_api.txt
+!pyproject.toml
+!setup.py
+
+# Core application files
+!src/
+!main.py
+!streamlit_app.py
+!run_api.py
+
+# Templates and static files
+!templates/
+!ml_dashboard.html
+!integrated_dashboard.html
+
+# Essential documentation
+!README.md
+!START_HERE.md
+
+# Anonymized processed data (no PII)
+!corrected_processed_data.csv
+
+# API structure
+!api/
+
+# Tests
+!tests/
+
+# ================================
+# NOTES FOR DEVELOPERS
+# ================================
+
+# This .gitignore follows these principles:
+# 1. NEVER commit sensitive data (API keys, passwords, PII)
+# 2. NEVER commit personal assessment data
+# 3. NEVER commit generated reports with individual information
+# 4. Keep only essential files for the application to work
+# 5. Exclude temporary, generated, and development files
+# 6. Follow Python and web development best practices

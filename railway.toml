@@ -1,0 +1,63 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Environment variables for Railway
+[env]
+PYTHONPATH = "/app"
+PYTHONUNBUFFERED = "1"
+
+# Service configurations
+[[services]]
+name = "victoria-dashboard"
+source = "."
+
+[services.build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+numReplicas = 1
+sleepApplication = false
+
+[services.healthcheck]
+httpPath = "/_stcore/health"
+initialDelaySeconds = 30
+periodSeconds = 10
+
+[services.env]
+SERVICE_TYPE = "dashboard"
+STREAMLIT_SERVER_PORT = "$PORT"
+STREAMLIT_SERVER_ADDRESS = "0.0.0.0"
+
+[services.run]
+command = "streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true"
+
+[[services]]
+name = "victoria-api"
+source = "."
+
+[services.build]
+builder = "DOCKERFILE" 
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+numReplicas = 1
+sleepApplication = false
+
+[services.healthcheck]
+httpPath = "/api/v1/health"
+initialDelaySeconds = 30
+periodSeconds = 10
+
+[services.env]
+SERVICE_TYPE = "api"
+
+[services.run]
+command = "python run_api.py --host 0.0.0.0 --port=$PORT"

@@ -1,0 +1,86 @@
+# Docker ignore for Victoria Project
+# Exclude files not needed in Docker image
+
+# Development and version control
+.git
+.gitignore
+*.md
+!README.md
+
+# Python cache and virtual environments
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+.venv
+.venv_new
+venv
+ENV
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Logs and temporary files
+*.log
+logs/*
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Generated outputs (will be created in container)
+output/
+test_output/
+temp/
+*.png
+*.jpg
+*.pdf
+
+# Test and development files
+tests/
+test_*
+*_test.py
+
+# Documentation files
+docs/
+*.md
+!README.md
+
+# Dependency files (already copied via requirements.txt)
+RaschPy/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Sample data files (will be added manually if needed)
+sample_data.*
+processed_output*.txt
+
+# Docker files (don't copy into image)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Railway and deployment configs
+railway.toml
+.railway/
+
+# Large example datasets
+Assessment*.csv
+Raw*.csv
+responses-*.csv
