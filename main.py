@@ -1,543 +1,394 @@
+#!/usr/bin/env python3
 """
-Main entry point for Victoria Project Psychometric Reporting Pipeline
-Enhanced with personality dashboard capabilities
+Victoria Project - Unified Main Entry Point
+Comprehensive psychometric assessment analysis system with Vertria archetype integration
+
+Usage:
+    python main.py                    # Show help and options
+    python main.py streamlit          # Run Streamlit web interface
+    python main.py api                # Run FastAPI server
+    python main.py process <file>     # Process data directly
+    python main.py report <file>      # Generate individual report
+    python main.py cluster <file>     # Perform cluster analysis
 """
 
 import sys
-import os
 import argparse
+import asyncio
 import logging
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Optional, Dict, Any
 
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# Add project root to path
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
 
-# Import configuration
-from config import config
-
-# Setup basic logging first
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Import core pipeline components with error handling
-try:
-    from src.pipeline.main_orchestrator import PsychometricPipeline
-    PIPELINE_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Pipeline not available: {e}")
-    PIPELINE_AVAILABLE = False
-    PsychometricPipeline = None
-
-# Note: The main.py now uses the same comprehensive processing workflow as the Streamlit app:
-# 1. ComprehensiveDataProcessor for raw data transformation
-# 2. RaschPy analysis for psychometric scoring
-# 3. TraitScorer for individual trait profile generation
-# 4. All outputs match the Streamlit app functionality exactly
-
-try:
-    from src.visualization.personality_dashboard import PersonalityDashboard
-    PERSONALITY_DASHBOARD_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Personality dashboard not available: {e}")
-    PERSONALITY_DASHBOARD_AVAILABLE = False
-    PersonalityDashboard = None
-
-try:
-    from src.visualization.dashboard_integration import DashboardIntegration
-    DASHBOARD_INTEGRATION_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Dashboard integration not available: {e}")
-    DASHBOARD_INTEGRATION_AVAILABLE = False
-    DashboardIntegration = None
-
-try:
-    from src.reports.personality_report_generator import PersonalityReportGenerator, ReportConfig
-    PERSONALITY_REPORTS_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Personality report generator not available: {e}")
-    PERSONALITY_REPORTS_AVAILABLE = False
-    PersonalityReportGenerator = None
-    ReportConfig = None
-
-try:
-    from src.utils.logging_config import setup_logging
-    setup_logging()
-except ImportError:
-    # Fallback logging setup
-    logging.basicConfig(level=logging.INFO)
-
-# Import API components
-from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-import uvicorn
+# Victoria imports
+from victoria.config.settings import config, app_config, brand_config
+from victoria.utils.logging_config import setup_logging
+from victoria.scoring.trait_scorer import TraitScorer
+from victoria.clustering.trait_clustering_engine import TraitClusteringEngine
+from victoria.clustering.archetype_mapper import ArchetypeMapper
+from victoria.reporting.dynamic_report_generator import DynamicReportGenerator
 
 # Setup logging
-setup_logging()
+setup_logging(log_level="INFO")
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
-app = FastAPI(
-    title="Victoria Project - Psychometric Reporting Pipeline",
-    description="Enhanced psychometric assessment reporting with Streamlit-like raw data processing, RaschPy analysis, and personality dashboard",
-    version="2.1.0"
-)
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Mount static files
-static_dir = Path(__file__).parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
-# Global components
-orchestrator = PsychometricPipeline() if PIPELINE_AVAILABLE else None
-dashboard_integration = DashboardIntegration() if DASHBOARD_INTEGRATION_AVAILABLE else None
-personality_dashboard = PersonalityDashboard() if PERSONALITY_DASHBOARD_AVAILABLE else None
-personality_report_generator = PersonalityReportGenerator() if PERSONALITY_REPORTS_AVAILABLE else None
-
-
-@app.get("/")
-async def root():
-    """Root endpoint with dashboard overview"""
-    return {
-        "message": "Victoria Project - Enhanced Psychometric Reporting Pipeline",
-        "version": "2.1.0",
-        "features": [
-            "Raw survey data processing (32 rows, 204 columns)",
-            "Streamlit-like comprehensive data transformation",
-            "RaschPy psychometric analysis",
-            "Individual personality reports",
-            "Interactive visualizations",
-            "Trait clustering and correlation analysis",
-            "Archetype analysis",
-            "Comprehensive dashboards",
-            "PDF/HTML reports"
-        ],
-        "processing_workflow": [
-            "1. Raw CSV input processing",
-            "2. Trait mapping and data transformation",
-            "3. RaschPy analysis for psychometric scoring",
-            "4. Comprehensive trait profile generation",
-            "5. All outputs matching Streamlit app functionality"
-        ],
-        "status": "running"
-    }
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "service": "psychometric-pipeline"}
-
-
-@app.post("/api/v1/process")
-async def process_assessment(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
-    """Process assessment file and generate comprehensive reports"""
-    try:
-        # Save uploaded file
-        upload_dir = Path("temp/uploads")
-        upload_dir.mkdir(parents=True, exist_ok=True)
+class VictoriaProject:
+    """Main Victoria Project application class"""
+    
+    def __init__(self):
+        """Initialize Victoria Project components"""
+        self.trait_scorer = TraitScorer()
+        self.clustering_engine = TraitClusteringEngine()
+        self.archetype_mapper = ArchetypeMapper()
+        self.report_generator = DynamicReportGenerator()
         
-        file_path = upload_dir / file.filename
-        content = await file.read()
+    def run_streamlit(self):
+        """Run Streamlit web interface"""
+        print("Starting Victoria Project Streamlit Interface...")
+        print("URL: http://localhost:8501")
+        print("Features: Individual Analysis, Clustering, Reports")
+        print("=" * 60)
         
-        with open(file_path, "wb") as f:
-            f.write(content)
+        import subprocess
+        app_path = project_root / "app" / "streamlit" / "main.py"
         
-        # Process the file
-        background_tasks.add_task(process_file_background, str(file_path))
+        if not app_path.exists():
+            print(f"❌ Error: Streamlit app not found at {app_path}")
+            return 1
         
-        return {
-            "message": "File uploaded and processing started",
-            "filename": file.filename,
-            "status": "processing"
-        }
+        cmd = [
+            sys.executable, "-m", "streamlit", "run", 
+            str(app_path),
+            "--server.port", "8501",
+            "--server.address", "0.0.0.0",
+            "--server.headless", "true"
+        ]
         
-    except Exception as e:
-        logger.error(f"Error processing file: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/api/v1/dashboard")
-async def get_dashboard():
-    """Get main dashboard HTML"""
-    try:
-        dashboard_path = Path("ml_dashboard.html")
-        if dashboard_path.exists():
-            return FileResponse(str(dashboard_path), media_type="text/html")
-        else:
-            return HTMLResponse("<h1>Dashboard not found. Please process an assessment first.</h1>")
-    except Exception as e:
-        logger.error(f"Error serving dashboard: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/api/v1/reports")
-async def list_reports():
-    """List available reports"""
-    try:
-        reports_dir = Path("output/reports")
-        if not reports_dir.exists():
-            return {"reports": []}
+        return subprocess.run(cmd).returncode
+    
+    def run_api(self):
+        """Run FastAPI server"""
+        print("Starting Victoria Project API Server...")
+        print("API URL: http://localhost:8000")
+        print("Docs URL: http://localhost:8000/docs")
+        print("Features: REST API, Individual Analysis, Clustering")
+        print("=" * 60)
         
-        reports = []
-        for report_file in reports_dir.glob("*.html"):
-            reports.append({
-                "filename": report_file.name,
-                "path": str(report_file),
-                "size": report_file.stat().st_size,
-                "created": report_file.stat().st_mtime
-            })
+        # Import and run API
+        api_path = project_root / "app" / "api" / "main.py"
         
-        return {"reports": reports}
+        if not api_path.exists():
+            print(f"❌ Error: API app not found at {api_path}")
+            return 1
         
-    except Exception as e:
-        logger.error(f"Error listing reports: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/api/v1/reports/{report_name}")
-async def get_report(report_name: str):
-    """Get specific report file"""
-    try:
-        report_path = Path("output/reports") / report_name
-        if not report_path.exists():
-            raise HTTPException(status_code=404, detail="Report not found")
+        sys.path.insert(0, str(api_path.parent))
+        from main import main as api_main
         
-        return FileResponse(str(report_path), media_type="text/html")
-        
-    except Exception as e:
-        logger.error(f"Error serving report: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-async def process_file_background(file_path: str):
-    """Background task to process assessment file - now uses Streamlit-like processing"""
-    try:
-        logger.info(f"Processing file: {file_path}")
-        
-        # Try Streamlit-like processing first
-        success = process_file_command_line(file_path)
-        
-        if success:
-            logger.info("File processed successfully using Streamlit-like processing")
-            
-            # Try to process with main orchestrator for additional features
-            if orchestrator:
-                try:
-                    # Use the processed output file for orchestrator
-                    processed_file = config.output_file_path
-                    if os.path.exists(processed_file):
-                        results = orchestrator.process_file(processed_file)
-                        
-                        if results and results.get('success'):
-                            logger.info("Additional orchestrator processing completed")
-                            # Generate personality dashboard reports
-                            await generate_personality_reports(results)
-                        else:
-                            logger.warning("Additional orchestrator processing failed")
-                    else:
-                        logger.warning("Processed output file not found for orchestrator")
-                except Exception as e:
-                    logger.warning(f"Additional orchestrator processing failed: {e}")
-            
-        else:
-            logger.error("File processing failed")
-            
-    except Exception as e:
-        logger.error(f"Error in background processing: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
-
-
-async def generate_personality_reports(orchestrator_results: Dict[str, Any]):
-    """Generate enhanced personality reports from orchestrator results"""
-    try:
-        # Extract assessment data from orchestrator results
-        assessment_data = orchestrator_results.get('data', {})
-        
-        if not assessment_data:
-            logger.warning("No assessment data found in orchestrator results")
-            return
-        
-        # Convert orchestrator results to personality profiles
-        profiles = []
-        
-        # If we have multiple people in the data
-        if isinstance(assessment_data, list):
-            for person_data in assessment_data:
-                try:
-                    profile = dashboard_integration.process_assessment_data(person_data)
-                    profiles.append(profile)
-                except Exception as e:
-                    logger.warning(f"Error processing person data: {e}")
-                    continue
-        else:
-            # Single person assessment
-            try:
-                profile = dashboard_integration.process_assessment_data(assessment_data)
-                profiles.append(profile)
-            except Exception as e:
-                logger.warning(f"Error processing assessment data: {e}")
-                return
-        
-        # Generate reports for each profile
-        for profile in profiles:
-            try:
-                # Generate comprehensive dashboard
-                logger.info(f"Generating dashboard for {profile.name}")
-                
-                viz_files = personality_dashboard.generate_comprehensive_dashboard(
-                    profile=profile,
-                    comparison_profiles=profiles[:3] if len(profiles) > 1 else None,
-                    all_profiles=profiles,
-                    output_dir=f"output/personality_dashboard_{profile.person_id}"
-                )
-                
-                # Generate HTML report
-                config = ReportConfig(
-                    include_comparisons=True,
-                    include_archetype_analysis=True,
-                    include_development_plan=True,
-                    color_theme="professional",
-                    format="html"
-                )
-                
-                html_report = personality_report_generator.generate_html_report(
-                    profile=profile,
-                    config=config,
-                    all_profiles=profiles
-                )
-                
-                logger.info(f"Generated personality report for {profile.name}")
-                
-            except Exception as e:
-                logger.error(f"Error generating report for {profile.person_id}: {e}")
-                continue
-        
-        logger.info(f"Completed personality report generation for {len(profiles)} profiles")
-        
-    except Exception as e:
-        logger.error(f"Error generating personality reports: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
-
-
-def process_file_command_line(file_path: str, output_dir: str = None):
-    """Process file from command line - replicates Streamlit app functionality"""
-    try:
-        logger.info(f"Processing file: {file_path}")
-        
-        # Validate file exists
-        if not os.path.exists(file_path):
-            logger.error(f"File not found: {file_path}")
-            return False
-        
-        # Import required modules for Streamlit-like processing
         try:
-            from src.data.comprehensive_processor import ComprehensiveDataProcessor
-            from trait_scorer import TraitScorer
-            COMPREHENSIVE_PROCESSOR_AVAILABLE = True
-        except ImportError as e:
-            logger.error(f"Comprehensive processor not available: {e}")
-            return False
+            api_main()
+            return 0
+        except KeyboardInterrupt:
+            print("\n👋 API server stopped by user")
+            return 0
+        except Exception as e:
+            print(f"❌ API Error: {e}")
+            return 1
+    
+    def process_data(self, responses_file: str) -> Dict[str, Any]:
+        """Process psychometric data directly"""
+        print(f"Processing data from: {responses_file}")
         
-        # Initialize processors (same as Streamlit app)
-        comprehensive_processor = ComprehensiveDataProcessor()
-        trait_scorer = TraitScorer()
-        
-        # Set paths using configuration
-        traits_file_path = config.traits_file_path
-        responses_file_path = config.responses_file_path
-        output_path = config.output_file_path
-        
-        # Process with comprehensive processor (same as Streamlit app)
-        logger.info("Using comprehensive processor for raw data processing")
-        result = comprehensive_processor.process_complete_pipeline(
-            raw_data_path=file_path,
-            traits_file_path=traits_file_path,
-            output_path=output_path,
-            responses_file_path=responses_file_path
-        )
-        
-        if not result.success:
-            logger.error("Comprehensive processing failed")
-            if result.errors:
-                for error in result.errors:
-                    logger.error(f"• {error}")
-            return False
-        
-        logger.info("✅ Data loaded and processed successfully!")
-        logger.info(f"📁 Output saved to: {result.output_file_path}")
-        
-        # Calculate trait scores from processed data (same as Streamlit app)
-        logger.info("Calculating trait scores...")
-        trait_profiles = trait_scorer.calculate_trait_scores(
-            processed_data_path=result.output_file_path,
-            traits_file_path=traits_file_path
-        )
-        
-        if trait_profiles:
-            logger.info("✅ Trait scores calculated successfully!")
-            logger.info(f"📊 Calculated trait profiles for {len(trait_profiles)} individuals")
+        try:
+            # Check files exist
+            if not Path(responses_file).exists():
+                raise FileNotFoundError(f"Responses file not found: {responses_file}")
             
-            # Create scoring results DataFrame for compatibility
-            scoring_results = trait_scorer.create_scoring_dataframe(trait_profiles)
-            logger.info(f"📋 Created scoring DataFrame with {len(scoring_results)} records")
+            traits_file = config.traits_file_path
+            if not Path(traits_file).exists():
+                raise FileNotFoundError(f"Traits file not found: {traits_file}")
             
-            # Display summary information
-            if result.output_file_path and os.path.exists(result.output_file_path):
-                import pandas as pd
-                processed_df = pd.read_csv(result.output_file_path, sep='\t')
-                logger.info(f"📊 Processed Data Summary:")
-                logger.info(f"   • Total Records: {len(processed_df)}")
-                logger.info(f"   • Unique Persons: {processed_df['Persons'].nunique()}")
-                logger.info(f"   • Unique Items: {processed_df['Assessment_Items'].nunique()}")
-                logger.info(f"   • Average Measure: {processed_df['Measure'].mean():.3f}")
-                
-                # Show trait score summary
-                if not scoring_results.empty:
-                    trait_cols = [col for col in scoring_results.columns 
-                                 if col not in ['overall_score', 'overall_percentile', 'completion_rate']]
-                    logger.info(f"📈 Trait Scores Summary:")
-                    logger.info(f"   • Traits Assessed: {len(trait_cols)}")
-                    logger.info(f"   • Average Overall Score: {scoring_results['overall_score'].mean():.3f}")
-                    logger.info(f"   • Average Completion Rate: {scoring_results['completion_rate'].mean():.1%}")
-        else:
-            logger.warning("No trait profiles generated")
+            # Calculate trait scores
+            print("Calculating trait scores...")
+            profiles = self.trait_scorer.calculate_trait_scores(responses_file, traits_file)
+            
+            if not profiles:
+                raise ValueError("No profiles could be processed from the data")
+            
+            print(f"Processed {len(profiles)} individual profiles")
+            
+            # Perform clustering
+            print("Performing trait clustering...")
+            cluster_results = self.clustering_engine.analyze_trait_clusters(profiles)
+            
+            print(f"Generated {cluster_results.n_clusters} clusters")
+            print(f"Silhouette Score: {cluster_results.silhouette_score:.3f}")
+            
+            # Summary
+            results = {
+                'profiles_count': len(profiles),
+                'clusters_count': cluster_results.n_clusters,
+                'silhouette_score': cluster_results.silhouette_score,
+                'profiles': profiles,
+                'cluster_results': cluster_results
+            }
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Data processing error: {e}")
+            raise
+    
+    def generate_report(self, responses_file: str, person_id: Optional[str] = None):
+        """Generate individual HTML report"""
+        print(f"Generating individual report from: {responses_file}")
         
-        # Show processing log
-        logger.info("📋 Processing Log:")
-        for log_entry in result.processing_log:
-            logger.info(f"   • {log_entry}")
+        try:
+            # Process data first
+            results = self.process_data(responses_file)
+            profiles = results['profiles']
+            
+            # Select individual
+            if person_id and person_id in profiles:
+                profile = profiles[person_id]
+                print(f"Selected individual: {person_id}")
+            else:
+                profile = next(iter(profiles.values()))
+                print(f"Using first individual: {profile.person_id}")
+            
+            # Generate HTML report
+            print("Generating branded HTML report...")
+            report_path = self.report_generator.generate_individual_report(
+                profile, 
+                output_dir="output"
+            )
+            
+            print(f"Report saved to: {report_path}")
+            print(f"Open in browser: file://{Path(report_path).absolute()}")
+            
+            return report_path
+            
+        except Exception as e:
+            logger.error(f"Report generation error: {e}")
+            raise
+    
+    def analyze_clusters(self, responses_file: str):
+        """Perform comprehensive cluster analysis"""
+        print(f"🎯 Performing cluster analysis on: {responses_file}")
         
-        # Try to run the original orchestrator if available (for additional features)
-        if orchestrator:
-            logger.info("Running additional pipeline processing...")
-            try:
-                orchestrator_results = orchestrator.process_file(result.output_file_path)
-                if orchestrator_results and orchestrator_results.get('success'):
-                    logger.info("✅ Additional pipeline processing completed")
-                    
-                    # Generate comprehensive personality report if available
-                    if dashboard_integration:
-                        assessment_data = orchestrator_results.get('data', {})
-                        if assessment_data:
-                            comprehensive_results = dashboard_integration.generate_comprehensive_report(
-                                assessment_data=assessment_data,
-                                output_dir=output_dir
-                            )
-                            
-                            if comprehensive_results:
-                                logger.info("✅ Personality dashboard reports generated")
-                                logger.info(f"📁 Output directory: {comprehensive_results.get('output_directory')}")
-                                logger.info(f"📄 HTML report: {comprehensive_results.get('html_report')}")
-                                logger.info(f"📊 Visualizations: {len(comprehensive_results.get('visualizations', {}))}")
-                else:
-                    logger.warning("Additional pipeline processing failed")
-            except Exception as e:
-                logger.warning(f"Additional pipeline processing failed: {e}")
-        
-        # Check for traditional ML dashboard
-        dashboard_path = Path("ml_dashboard.html")
-        if dashboard_path.exists():
-            logger.info(f"📊 Traditional ML dashboard available at: {dashboard_path}")
-        
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error processing file: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
-        return False
+        try:
+            # Process data
+            results = self.process_data(responses_file)
+            cluster_results = results['cluster_results']
+            
+            # Display cluster details
+            print("\n" + "=" * 60)
+            print("📊 CLUSTER ANALYSIS RESULTS")
+            print("=" * 60)
+            
+            print(f"Number of Clusters: {cluster_results.n_clusters}")
+            print(f"Silhouette Score: {cluster_results.silhouette_score:.3f}")
+            print(f"Explained Variance: {cluster_results.explained_variance:.1%}")
+            print(f"Method Used: {cluster_results.method_used}")
+            
+            print("\n🎯 CLUSTER DETAILS:")
+            for i, cluster in enumerate(cluster_results.clusters):
+                print(f"\nCluster {i+1}: {cluster.cluster_name}")
+                print(f"  Size: {cluster.size} individuals")
+                print(f"  Description: {cluster.description}")
+                print(f"  Dominant Traits: {', '.join(cluster.traits)}")
+                if cluster.archetype_mapping:
+                    archetype_name = cluster.archetype_mapping.value.replace('_', ' ').title()
+                    print(f"  Archetype: {archetype_name}")
+            
+            # Archetype distribution
+            print("\n🏆 ARCHETYPE MAPPINGS:")
+            for cluster_id, archetype in cluster_results.archetype_mappings.items():
+                archetype_name = archetype.value.replace('_', ' ').title()
+                print(f"  Cluster {cluster_id + 1}: {archetype_name}")
+            
+            return cluster_results
+            
+        except Exception as e:
+            logger.error(f"Cluster analysis error: {e}")
+            raise
+    
+    def show_info(self):
+        """Display comprehensive project information"""
+        print("""
+VICTORIA PROJECT - Psychometric Assessment Analysis System
+===============================================================
 
+FEATURES:
+  * Individual psychometric trait analysis 
+  * Advanced trait clustering with ML algorithms
+  * Vertria's 5 entrepreneurial archetype integration
+  * Professional branded HTML reports
+  * REST API for integration
+  * Streamlit web interface
+
+VERTRIA ENTREPRENEURIAL ARCHETYPES:
+  * Strategic Innovation    - Risk Taking + Innovation + Strategic Thinking
+  * Resilient Leadership    - Leadership + Resilience + Adaptability  
+  * Collaborative Responsibility - Accountability + Team Building + Trust
+  * Ambitious Drive        - Passion/Drive + Resilience + Problem Solving
+  * Adaptive Intelligence  - Critical Thinking + EQ + Adaptability
+
+USAGE OPTIONS:
+  
+  Web Interface:
+    python main.py streamlit
+    -> Opens interactive dashboard at http://localhost:8501
+  
+  API Server:
+    python main.py api  
+    -> REST API at http://localhost:8000 (docs: /docs)
+  
+  Direct Processing:
+    python main.py process responses.csv
+    -> Process data and show summary
+  
+  Generate Report:
+    python main.py report responses.csv [person_id]
+    -> Create individual HTML report
+  
+  Cluster Analysis:
+    python main.py cluster responses.csv
+    -> Comprehensive clustering analysis
+
+PROJECT STRUCTURE:
+  victoria/              # Core business logic
+  |-- config/            # Configuration & settings
+  |-- core/              # Domain models & enums
+  |-- scoring/           # Psychometric trait scoring
+  |-- clustering/        # ML clustering & archetypes
+  |-- processing/        # Data processing pipeline
+  |-- reporting/         # HTML report generation
+  '-- utils/             # Shared utilities
+  
+  app/                   # Application interfaces
+  |-- streamlit/         # Web dashboard
+  '-- api/               # REST API
+
+BRAND INTEGRATION:
+  * Vertria color palette (Burgundy #570F27, Navy #151A4A, Yellow #FFDC58)
+  * Professional typography (Blair ITC, Outfit)
+  * Branded report templates with responsive design
+
+For support and documentation, visit the project repository.
+        """)
 
 def main():
-    """Main function to handle command line arguments"""
+    """Main application entry point"""
     parser = argparse.ArgumentParser(
-        description="Victoria Project Psychometric Reporting Pipeline - Enhanced with Streamlit-like Raw Data Processing"
+        description="Victoria Project - Psychometric Assessment Analysis System",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py                              # Show this help
+  python main.py streamlit                    # Run web interface  
+  python main.py api                          # Run API server
+  python main.py process data/responses.csv   # Process data
+  python main.py report data/responses.csv    # Generate report
+  python main.py cluster data/responses.csv   # Analyze clusters
+        """
     )
-    parser.add_argument("--file", "-f", help="Path to raw assessment data file (CSV with 32 rows, 204 columns)")
-    parser.add_argument("--output", "-o", help="Output directory for reports")
-    parser.add_argument("--server", "-s", action="store_true", help="Start web server")
-    parser.add_argument("--host", default="0.0.0.0", help="Server host")
-    parser.add_argument("--port", type=int, default=8000, help="Server port")
-    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    
+    parser.add_argument(
+        "command",
+        choices=["streamlit", "api", "process", "report", "cluster", "info"],
+        nargs="?",
+        default="info",
+        help="Command to execute"
+    )
+    
+    parser.add_argument(
+        "file",
+        nargs="?",
+        help="Input file path for process/report/cluster commands"
+    )
+    
+    parser.add_argument(
+        "person_id", 
+        nargs="?",
+        help="Person ID for individual report generation"
+    )
+    
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging"
+    )
     
     args = parser.parse_args()
     
-    # Set debug logging if requested
+    # Setup debug logging if requested
     if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
+        setup_logging(log_level="DEBUG")
     
-    # If file is provided, process it
-    if args.file:
-        logger.info("Command line file processing mode")
-        logger.info("🔄 Processing raw survey data through comprehensive pipeline...")
-        success = process_file_command_line(args.file, args.output)
-        if success:
-            logger.info("✅ File processing completed successfully")
-            logger.info("Generated outputs:")
-            logger.info("• 📄 Processed data (tab-separated): processed_output.txt")
-            logger.info("• 📊 Trait scores and profiles calculated")
-            logger.info("• 📈 Traditional ML dashboard: ml_dashboard.html")
-            logger.info("• 📋 Personality reports: output/reports/")
-            logger.info("• 🎨 Interactive visualizations: output/personality_dashboard_*/")
-            logger.info("")
-            logger.info("🎯 The main.py now processes raw survey data exactly like the Streamlit app:")
-            logger.info("   1. Takes raw CSV input (32 rows, 204 columns)")
-            logger.info("   2. Applies trait mapping and data transformation")
-            logger.info("   3. Runs RaschPy analysis for psychometric scoring")
-            logger.info("   4. Generates comprehensive trait profiles")
-            logger.info("   5. Creates all the same outputs as Streamlit app")
-        else:
-            logger.error("❌ File processing failed")
-        return
+    # Initialize Victoria Project
+    victoria = VictoriaProject()
     
-    # If server mode is requested or no file provided
-    if args.server or not args.file:
-        logger.info("Starting web server mode")
-        logger.info("Enhanced Psychometric Reporting Pipeline with Streamlit-like Raw Data Processing")
-        logger.info("=" * 80)
-        logger.info("🎯 Features:")
-        logger.info("• 📊 Raw survey data processing (32 rows, 204 columns)")
-        logger.info("• 🔄 Comprehensive data transformation pipeline")
-        logger.info("• 📈 RaschPy psychometric analysis")
-        logger.info("• 🎨 Interactive personality visualizations")
-        logger.info("• 📋 Comprehensive individual reports")
-        logger.info("• 🎯 Archetype analysis and matching")
-        logger.info("• 💪 Strengths & weaknesses analysis")
-        logger.info("• 📄 HTML and PDF report generation")
-        logger.info("• 📊 Population benchmarking")
-        logger.info("• 🔍 Trait clustering and correlation analysis")
-        logger.info("=" * 80)
-        logger.info("")
-        logger.info("💡 Usage Examples:")
-        logger.info("   # Process raw survey data file:")
-        logger.info("   python main.py --file path/to/raw_data.csv")
-        logger.info("")
-        logger.info("   # Start web server:")
-        logger.info("   python main.py --server")
-        logger.info("=" * 80)
+    try:
+        if args.command == "streamlit":
+            return victoria.run_streamlit()
+            
+        elif args.command == "api":
+            return victoria.run_api()
+            
+        elif args.command == "process":
+            if not args.file:
+                print("❌ Error: File path required for process command")
+                print("Usage: python main.py process <responses_file>")
+                return 1
+            
+            results = victoria.process_data(args.file)
+            print(f"\n✅ Processing completed successfully!")
+            print(f"📊 Processed {results['profiles_count']} profiles")
+            print(f"🎯 Generated {results['clusters_count']} clusters")
+            return 0
+            
+        elif args.command == "report":
+            if not args.file:
+                print("❌ Error: File path required for report command")
+                print("Usage: python main.py report <responses_file> [person_id]")
+                return 1
+            
+            report_path = victoria.generate_report(args.file, args.person_id)
+            print(f"\nReport generation completed!")
+            return 0
+            
+        elif args.command == "cluster":
+            if not args.file:
+                print("❌ Error: File path required for cluster command")
+                print("Usage: python main.py cluster <responses_file>")
+                return 1
+            
+            cluster_results = victoria.analyze_clusters(args.file)
+            print(f"\n✅ Cluster analysis completed!")
+            return 0
+            
+        else:  # info or default
+            victoria.show_info()
+            return 0
+            
+    except KeyboardInterrupt:
+        print("\nOperation stopped by user")
+        return 0
         
-        uvicorn.run(
-            app,
-            host=args.host,
-            port=args.port,
-            reload=True,
-            log_level="info"
-        )
-
+    except FileNotFoundError as e:
+        print(f"FILE ERROR: {e}")
+        return 1
+        
+    except Exception as e:
+        logger.error(f"Application error: {e}")
+        print(f"ERROR: {e}")
+        if args.debug:
+            import traceback
+            traceback.print_exc()
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
