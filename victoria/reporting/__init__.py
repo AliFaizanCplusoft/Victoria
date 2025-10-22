@@ -2,6 +2,13 @@
 Report generation module for Victoria Project
 """
 
-from .html_report_generator import HTMLReportGenerator
+from .dynamic_report_generator import DynamicReportGenerator
 
-__all__ = ['HTMLReportGenerator']
+__all__ = ['DynamicReportGenerator']
+
+
+
+
+
+
+

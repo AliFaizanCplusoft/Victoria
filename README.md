@@ -150,21 +150,34 @@ python main.py --file survey_data.csv --output reports/
 
 ```
 Victoria_Project/
-├── src/                          # Core source code
-│   ├── data/                     # Data processing modules
+├── app/                          # Application entry points
+│   ├── api/                      # FastAPI application
+│   └── streamlit/                # Streamlit UI application
+├── victoria/                     # Core business logic package
+│   ├── config/                   # Configuration management
+│   ├── core/                     # Core domain models and services
+│   ├── processing/               # Data processing pipeline
 │   ├── scoring/                  # Psychometric scoring
-│   ├── clustering/               # ML clustering
-│   ├── reports/                  # Report generation
-│   └── visualization/            # Chart and dashboard components
-├── api/                          # FastAPI server
+│   ├── clustering/               # Trait clustering
+│   ├── reporting/                # Report generation
+│   └── utils/                    # Shared utilities
+├── data/                         # Data files
 ├── templates/                    # HTML report templates
-├── RaschPy/                      # Psychometric analysis library
-├── streamlit_app.py             # Main dashboard application
+├── tests/                        # Test files
+├── victoria_pipeline.py         # Main pipeline script
 ├── main.py                      # CLI processing tool
-├── run_api.py                   # API server launcher
-├── ml_dashboard.html            # ML clustering visualization
 └── requirements.txt             # All dependencies
 ```
+
+### Module Responsibilities
+
+- **victoria.config**: Environment configuration, file path management, feature flags
+- **victoria.core**: Domain models, core business interfaces, shared types
+- **victoria.processing**: Data validation, RaschPy integration, data transformation
+- **victoria.scoring**: Individual trait scoring, percentile calculations
+- **victoria.clustering**: Trait correlation analysis, clustering algorithms, archetype mapping
+- **victoria.reporting**: HTML report generation, PDF export, visualization creation
+- **victoria.utils**: Common utilities, data helpers, logging setup
 
 ## 🔧 API Endpoints
 
@@ -276,6 +289,89 @@ When working correctly, you should see:
 - ✅ ML dashboard with clustering results
 - ✅ Export options functioning
 
+## 🚀 Deployment Options
+
+### 🐳 Docker Deployment (Recommended)
+
+#### Quick Start - Local Testing
+```bash
+# 1. Build the Docker image
+docker build -t victoria-project .
+
+# 2. Run both services with Docker Compose
+docker-compose up -d
+
+# Access:
+# Dashboard: http://localhost:8501
+# API: http://localhost:8000/docs
+```
+
+#### Production Docker Deployment
+```bash
+# Build for production
+docker build -t victoria-project:production .
+
+# Run with production profile (includes nginx)
+docker-compose --profile production up -d
+```
+
+### 🚂 Railway Deployment (Cloud)
+
+Railway automatically detects Docker and makes deployment simple:
+
+#### Method 1: Railway CLI (Recommended)
+```bash
+# 1. Install Railway CLI
+npm install -g @railway/cli
+
+# 2. Login to Railway
+railway login
+
+# 3. Create new project
+railway new victoria-project
+
+# 4. Deploy both services
+railway up --service dashboard
+railway add
+railway up --service api
+```
+
+#### Method 2: GitHub Integration
+1. Push to GitHub
+2. Go to [railway.app](https://railway.app)
+3. Click "Deploy from GitHub"
+4. Select your Victoria Project repo
+5. Create two services:
+   - **Dashboard Service**: `SERVICE_TYPE=dashboard`
+   - **API Service**: `SERVICE_TYPE=api`
+
+### 🌐 Other Cloud Providers
+
+#### Google Cloud Run
+```bash
+# Build and deploy
+gcloud builds submit --tag gcr.io/PROJECT-ID/victoria
+gcloud run deploy victoria-dashboard --image gcr.io/PROJECT-ID/victoria --set-env-vars SERVICE_TYPE=dashboard
+gcloud run deploy victoria-api --image gcr.io/PROJECT-ID/victoria --set-env-vars SERVICE_TYPE=api
+```
+
+#### AWS ECS Fargate
+- Push to ECR
+- Create task definitions for dashboard and API services
+- Deploy using ECS Fargate with the same image, different commands
+
+### 🔧 Service Configuration
+
+| Variable | Dashboard | API | Description |
+|----------|-----------|-----|-------------|
+| `SERVICE_TYPE` | `dashboard` | `api` | Service identifier |
+| `PORT` | `8501` | `8000` | Service port |
+| `PYTHONPATH` | `/app` | `/app` | Python path |
+
+**Commands:**
+- **Dashboard**: `streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0`
+- **API**: `python run_api.py --host 0.0.0.0 --port=$PORT`
+
 ## 📞 Support & Documentation
 
 ### Resources
@@ -289,6 +385,8 @@ When working correctly, you should see:
 2. **RaschPy Failures**: System includes fallback analysis methods
 3. **Memory Issues**: Close other applications, use smaller datasets for testing
 4. **Port Conflicts**: Change port numbers in startup commands
+5. **Docker Build Issues**: Clear cache with `docker system prune -a`
+6. **Railway Deployment**: Check logs with `railway logs` and verify environment variables
 
 ## 🎉 Ready to Analyze!
 

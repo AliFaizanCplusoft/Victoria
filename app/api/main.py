@@ -1,10 +1,13 @@
 """
-FastAPI Application Entry Point
-Clean, modular API for Victoria Project
+Victoria Project API - Streamlined Assessment Pipeline
+Single endpoint for complete psychometric assessment and HTML report generation
 """
 
 import sys
+import os
+import tempfile
 from pathlib import Path
+from typing import Optional
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent.parent
@@ -15,33 +18,38 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from contextlib import asynccontextmanager
 import logging
-from typing import Dict, List, Optional
 import uvicorn
+from dotenv import load_dotenv
 
-# Victoria imports
-from victoria.config.settings import config, app_config, brand_config
-from victoria.utils.logging_config import setup_logging
-from victoria.scoring.trait_scorer import TraitScorer
-from victoria.clustering.trait_clustering_engine import TraitClusteringEngine
-from victoria.clustering.archetype_mapper import ArchetypeMapper
-from victoria.core.models import PersonTraitProfile, ClusteringResult
+# Load environment variables
+load_dotenv()
+
+# Import Victoria Pipeline
+from victoria_pipeline import VictoriaPipeline
 
 # Setup logging
-setup_logging(log_level="INFO")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('api.log'),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 # Application lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan management"""
-    logger.info("Starting Victoria API...")
+    logger.info("Starting Victoria Assessment API...")
     yield
-    logger.info("Shutting down Victoria API...")
+    logger.info("Shutting down Victoria Assessment API...")
 
 # Create FastAPI application
 app = FastAPI(
-    title="Victoria Project API",
-    description="Psychometric Assessment Analysis API with Entrepreneurial Archetype Integration",
+    title="Victoria Assessment API",
+    description="Complete psychometric assessment pipeline with HTML report generation",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -57,217 +65,121 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global services
-trait_scorer = TraitScorer()
-clustering_engine = TraitClusteringEngine()
-archetype_mapper = ArchetypeMapper()
+# Global pipeline instance
+pipeline = None
 
 @app.get("/")
 async def root():
     """API root endpoint"""
     return {
-        "message": "Victoria Project API",
+        "message": "Victoria Assessment API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs"
+        "description": "Complete psychometric assessment pipeline with HTML report generation",
+        "endpoints": {
+            "generate_report": "POST /api/v1/generate-report",
+            "health": "GET /health",
+            "docs": "GET /docs"
+        }
     }
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "services": {
-            "trait_scorer": "ready",
-            "clustering_engine": "ready", 
-            "archetype_mapper": "ready"
+    global pipeline
+    try:
+        if pipeline is None:
+            pipeline = VictoriaPipeline()
+        return {
+            "status": "healthy",
+            "pipeline": "ready",
+            "openai_client": "ready" if pipeline.openai_client else "not_available"
         }
-    }
-
-@app.post("/api/v1/analyze/individual")
-async def analyze_individual(
-    responses_file: UploadFile = File(...),
-    person_id: Optional[str] = None
-):
-    """Analyze individual psychometric profile"""
-    try:
-        # Save uploaded file temporarily
-        import tempfile
-        import os
-        
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as tmp_file:
-            content = await responses_file.read()
-            tmp_file.write(content)
-            tmp_file_path = tmp_file.name
-        
-        try:
-            # Process data
-            traits_file = config.traits_file_path
-            profiles = trait_scorer.calculate_trait_scores(tmp_file_path, traits_file)
-            
-            if not profiles:
-                raise HTTPException(status_code=400, detail="No profiles could be processed")
-            
-            # Return specific individual or first one
-            if person_id and person_id in profiles:
-                profile = profiles[person_id]
-            else:
-                profile = next(iter(profiles.values()))
-            
-            return {
-                "status": "success",
-                "profile": {
-                    "person_id": profile.person_id,
-                    "overall_score": profile.overall_score,
-                    "completion_rate": profile.completion_rate,
-                    "traits": [
-                        {
-                            "trait_name": trait.trait_name,
-                            "score": trait.score,
-                            "percentile": trait.percentile,
-                            "level": trait.level.value if trait.level else None
-                        }
-                        for trait in profile.traits
-                    ],
-                    "primary_archetype": {
-                        "archetype": profile.primary_archetype.archetype.value,
-                        "score": profile.primary_archetype.score,
-                        "confidence": profile.primary_archetype.confidence,
-                        "description": profile.primary_archetype.description
-                    } if profile.primary_archetype else None,
-                    "recommendations": profile.recommendations,
-                    "growth_areas": profile.growth_areas
-                }
-            }
-            
-        finally:
-            # Clean up temporary file
-            os.unlink(tmp_file_path)
-            
     except Exception as e:
-        logger.error(f"Individual analysis error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }
 
-@app.post("/api/v1/analyze/cluster")
-async def analyze_clusters(
+@app.post("/api/v1/generate-report")
+async def generate_assessment_report(
     responses_file: UploadFile = File(...),
-    method: str = "kmeans",
-    n_clusters: int = 5
+    person_index: int = 0
 ):
-    """Perform trait clustering analysis"""
+    """
+    Generate a complete Victoria assessment report from uploaded CSV data
+    
+    This endpoint processes the uploaded CSV file through the complete Victoria pipeline:
+    1. Loads and processes raw assessment data
+    2. Maps responses to numeric values
+    3. Calculates Rasch measures for psychometric analysis
+    4. Calculates trait scores using the FixedTraitScorer
+    5. Detects entrepreneurial archetype based on trait patterns
+    6. Extracts and analyzes open-ended responses
+    7. Generates visualizations and inspiring content
+    8. Creates a comprehensive HTML report
+    
+    Args:
+        responses_file: CSV file containing assessment responses
+        person_index: Index of person to process (default: 0)
+    
+    Returns:
+        HTML report file as response
+    """
+    global pipeline
+    
     try:
-        # Save uploaded file temporarily
-        import tempfile
-        import os
+        # Initialize pipeline if not already done
+        if pipeline is None:
+            logger.info("Initializing Victoria Pipeline...")
+            pipeline = VictoriaPipeline()
         
+        # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as tmp_file:
             content = await responses_file.read()
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
         
         try:
-            # Process data
-            traits_file = config.traits_file_path
-            profiles = trait_scorer.calculate_trait_scores(tmp_file_path, traits_file)
+            logger.info(f"Processing assessment data for person index: {person_index}")
             
-            if not profiles:
-                raise HTTPException(status_code=400, detail="No profiles could be processed")
-            
-            # Perform clustering
-            cluster_results = clustering_engine.analyze_trait_clusters(
-                profiles, method=method, n_clusters=n_clusters
+            # Generate the complete report using the pipeline
+            report_path = pipeline.generate_report(
+                csv_path=tmp_file_path,
+                output_dir="output/reports",
+                person_index=person_index
             )
             
-            return {
-                "status": "success",
-                "clustering_results": {
-                    "n_clusters": cluster_results.n_clusters,
-                    "silhouette_score": cluster_results.silhouette_score,
-                    "explained_variance": cluster_results.explained_variance,
-                    "method_used": cluster_results.method_used,
-                    "clusters": [
-                        {
-                            "cluster_id": cluster.cluster_id,
-                            "cluster_name": cluster.cluster_name,
-                            "description": cluster.description,
-                            "size": cluster.size,
-                            "dominant_traits": cluster.traits,
-                            "archetype_mapping": cluster.archetype_mapping.value if cluster.archetype_mapping else None
-                        }
-                        for cluster in cluster_results.clusters
-                    ],
-                    "archetype_mappings": {
-                        str(k): v.value for k, v in cluster_results.archetype_mappings.items()
-                    }
+            if not os.path.exists(report_path):
+                raise HTTPException(
+                    status_code=500, 
+                    detail="Report generation failed - file not created"
+                )
+            
+            logger.info(f"Report generated successfully: {report_path}")
+            
+            # Return the HTML file
+            return FileResponse(
+                path=report_path,
+                media_type="text/html",
+                filename=os.path.basename(report_path),
+                headers={
+                    "Content-Disposition": f"attachment; filename={os.path.basename(report_path)}"
                 }
-            }
+            )
             
         finally:
             # Clean up temporary file
-            os.unlink(tmp_file_path)
+            if os.path.exists(tmp_file_path):
+                os.unlink(tmp_file_path)
             
     except Exception as e:
-        logger.error(f"Cluster analysis error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/archetypes")
-async def get_archetypes():
-    """Get information about Vertria's entrepreneurial archetypes"""
-    from victoria.config.settings import archetype_config
-    
-    return {
-        "status": "success",
-        "archetypes": {
-            key: {
-                "name": info["name"],
-                "description": info["description"],
-                "core_traits": info["core_traits"],
-                "characteristics": info["characteristics"]
-            }
-            for key, info in archetype_config.ARCHETYPES.items()
-        }
-    }
-
-@app.get("/api/v1/traits")
-async def get_traits():
-    """Get information about core traits"""
-    from victoria.config.settings import trait_config
-    
-    return {
-        "status": "success",
-        "traits": trait_config.CORE_TRAITS
-    }
-
-@app.post("/api/v1/reports/html")
-async def generate_html_report(
-    responses_file: UploadFile = File(...),
-    person_id: Optional[str] = None
-):
-    """Generate HTML report for individual"""
-    # This will be implemented in the reporting module
-    return {
-        "status": "success",
-        "message": "HTML report generation will be implemented in the next phase"
-    }
-
-@app.get("/api/v1/config")
-async def get_configuration():
-    """Get API configuration information"""
-    return {
-        "status": "success",
-        "config": {
-            "version": "1.0.0",
-            "environment": app_config.ENVIRONMENT,
-            "features": {
-                "llm_reports": app_config.ENABLE_LLM_REPORTS,
-                "caching": app_config.LLM_CACHE_ENABLED
-            },
-            "brand": {
-                "colors": brand_config.COLORS,
-                "fonts": brand_config.FONTS
-            }
-        }
-    }
+        logger.error(f"Report generation error: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to generate report: {str(e)}"
+        )
 
 # Error handlers
 @app.exception_handler(404)
@@ -283,9 +195,9 @@ def main():
     """Run the API server"""
     uvicorn.run(
         "main:app",
-        host=app_config.API_HOST,
-        port=app_config.API_PORT,
-        reload=app_config.DEBUG,
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
         log_level="info"
     )
 

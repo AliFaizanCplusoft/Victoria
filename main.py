@@ -84,11 +84,19 @@ class VictoriaProject:
             print(f"❌ Error: API app not found at {api_path}")
             return 1
         
+        # Add the API directory to path and import the app
         sys.path.insert(0, str(api_path.parent))
-        from main import main as api_main
+        from main import app
         
         try:
-            api_main()
+            import uvicorn
+            uvicorn.run(
+                app,
+                host="0.0.0.0",
+                port=8000,
+                reload=False,  # Disable reload to avoid file watching issues
+                log_level="info"
+            )
             return 0
         except KeyboardInterrupt:
             print("\n👋 API server stopped by user")

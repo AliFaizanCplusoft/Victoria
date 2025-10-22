@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertria Entrepreneurial Assessment - Victoria Raish</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --vertria-burgundy: #570F27;
+            --vertria-dark-blue: #151A4A;
+            --vertria-yellow: #FFDC58;
+            --vertria-deep-burgundy: #240610;
+            --vertria-light-burgundy: #8B2545;
+            --vertria-accent-blue: #2E4A7A;
+            --vertria-background: #FEFEFE;
+            --vertria-light-gray: #F8F9FA;
+            --vertria-text-dark: #2D3748;
+            --vertria-text-medium: #4A5568;
+            --vertria-text-light: #718096;
+            --vertria-primary: #570F27;
+            --vertria-secondary: #8B2545;
+            --vertria-success: #38A169;
+            --vertria-warning: #D69E2E;
+            --vertria-danger: #E53E3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.5;
+            color: var(--vertria-text-dark);
+            background-color: var(--vertria-background);
+            font-size: 13px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        .report-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            overflow: hidden;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-deep-burgundy) 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .company-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-quote {
+            font-style: italic;
+            color: #FFE888;
+            margin-top: 0.75rem;
+        }
+
+        .intro-line {
+            margin-top: 0.5rem;
+            color: #FFE888;
+        }
+
+        .report-title {
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .person-name {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .report-date {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .archetype-subheader {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--vertria-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .report-content {
+            padding: 2.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, var(--vertria-light-gray) 0%, #F0F2F5 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-primary);
+        }
+
+        .interpretation-guide {
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-accent-blue);
+            margin-bottom: 2rem;
+        }
+
+        .interpretation-guide h3 {
+            color: var(--vertria-accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .personalized-insights {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-accent-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .personalized-insights h3 {
+            color: var(--vertria-accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .primary-archetype {
+            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-light-burgundy) 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .archetype-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .archetype-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FFE888;
+            margin-bottom: 1rem;
+        }
+
+        .archetype-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--vertria-light-gray);
+            box-shadow: 0 2px 8px rgba(46, 74, 122, 0.05);
+        }
+
+        .metric-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--vertria-primary);
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--vertria-primary);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--vertria-text-medium);
+            margin-top: 0.5rem;
+        }
+
+        .metric-explanation {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .trait-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: var(--vertria-light-gray);
+            border-radius: 6px;
+            border-left: 3px solid var(--vertria-primary);
+        }
+
+        .trait-name {
+            flex: 1;
+            font-weight: 500;
+            color: var(--vertria-text-dark);
+        }
+
+        .trait-score {
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-right: 1rem;
+            min-width: 60px;
+        }
+
+        .trait-bar-container {
+            flex: 2;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+
+        .trait-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .trait-bar.low {
+            background: linear-gradient(90deg, var(--vertria-danger), #FC8181);
+        }
+
+        .trait-bar.med {
+            background: linear-gradient(90deg, var(--vertria-warning), #F6E05E);
+        }
+
+        .trait-bar.high {
+            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container .plotly-graph-div {
+            width: 100% !important;
+            height: 418px !important;
+            max-width: 100%;
+        }
+
+        .strengths-gauges .plotly-graph-div,
+        .growth-gauges .plotly-graph-div {
+            width: 100% !important;
+            height: 300px !important;
+        }
+
+        .trait-explanation {
+            
+            
+            
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(87, 15, 39, 0.1);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .trait-explanation p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #2c3e50;
+            font-style: italic;
+            text-align: left;
+        }
+
+        .chart-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .guidance-text {
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            border-left: 4px solid var(--vertria-primary);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .guidance-text p {
+            margin: 0;
+            color: var(--vertria-text-dark);
+        }
+
+        .guidance-text strong {
+            color: var(--vertria-primary);
+            font-weight: 600;
+        }
+
+        .archetype-match-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            border-radius: 12px;
+        }
+
+        .archetype-progress {
+            margin: 2rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--vertria-primary);
+        }
+
+        .archetype-traits {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            
+            border-radius: 8px;
+            
+        }
+
+        .archetype-traits h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .archetype-traits p {
+            margin: 0;
+            color: #2D3748;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .trait-definitions {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .trait-definition {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-yellow);
+        }
+
+        .trait-definition strong {
+            color: var(--vertria-primary);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .trait-definition p {
+            color: #4A5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Low-scoring trait styles */
+        .trait-definition.low-score {
+            background: #FFF8E1;
+            border-left: 4px solid #F57F17;
+        }
+
+        /* Growth opportunity boxes styling */
+        .stage-highlight.discover {
+            background: #FFF8E1;
+            border-left: 4px solid #F57F17;
+        }
+
+        .trait-definition.low-score strong {
+            color: #E65100;
+            font-weight: 700;
+        }
+
+        .trait-definition.low-score p {
+            color: #BF360C;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .heatmap-section {
+            margin-top: 2rem;
+           
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .heatmap-section h4 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .heatmap-section .guidance-text {
+            margin-bottom: 1.5rem;
+        }
+
+        .heatmap-section .guidance-text p {
+            color: #4A5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 525px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 525px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .chart-container1 {
+            display: flex;
+            justify-content: center;
+
+            min-height: 630px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .chart-container .plotly-graph-div {
+            max-width: 100%;
+            height: auto;
+            width: 100%;
+        }
+
+        .stage-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .stage-highlight {
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stage-highlight1 {
+            padding: 2rem;
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        .stage-highlight.build {
+            background: linear-gradient(135deg, #FED7D7 0%, #FEB2B2 100%);
+            border: 2px solid var(--vertria-danger);
+        }
+
+        .stage-highlight.explore {
+            background: linear-gradient(135deg, #BEE3F8 0%, #90CDF4 100%);
+            border: 2px solid var(--vertria-accent-blue);
+        }
+
+        .stage-highlight.discover {
+            background: #FFF8E1;
+            border: 2px solid #F57F17;
+        }
+
+        .stage-highlight h4 {
+            color: var(--vertria-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .stage-definitions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stage-definition {
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 8px;
+            border-left: 4px solid #E5E7EB;
+        }
+
+        .stage-definition.active {
+            background: var(--vertria-light-gray);
+            border-left-color: var(--vertria-primary);
+        }
+
+        .trait-highlights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .trait-highlight {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .gauge-charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .gauge-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(87, 15, 39, 0.05);
+        }
+
+        .gauge-section h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .growth-recommendations {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-yellow);
+        }
+
+        .recommendations-content {
+            margin-top: 1rem;
+        }
+
+        .recommendations-content p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .recommendations-content ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .recommendations-content li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .reflection-questions {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-accent-blue);
+        }
+
+        .reflection-intro {
+            font-style: italic;
+            margin-bottom: 2rem;
+            color: var(--vertria-text-medium);
+        }
+
+        .questions-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .question-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .archetype-activation-section {
+            background: rgba(87, 31, 39, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+            margin: 1.5rem 0;
+        }
+
+        .archetype-activation-section h2 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .archetype-activation-section p {
+            color: var(--vertria-text-dark);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .archetype-activation-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .community-next-steps {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-yellow);
+        }
+
+        .growth-opportunities-box {
+            background: var(--vertria-yellow);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+
+        .vantage-section,
+        .mentors-section,
+        .community-section {
+            margin: 1.5rem 0;
+        }
+
+        .community-items {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .community-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-footer {
+            background: var(--vertria-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .report-footer p {
+            margin: 0.5rem 0;
+        }
+
+        .correlation-explanation {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(87, 15, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .correlation-explanation h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .correlation-explanation p {
+            color: #4A5568;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .growth-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .growth-section h3 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .growth-description {
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .growth-description p {
+            font-size: 1rem;
+            color: #4A5568;
+        }
+
+        .strengths-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .strengths-description {
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .strengths-description p {
+            font-size: 0.95rem;
+            color: #4A5568;
+        }
+
+        .vantage-section {
+            background: linear-gradient(135deg, #571F27 0%, #8B2A3A 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            box-shadow: 0 8px 25px rgba(87, 31, 39, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vantage-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .vantage-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .vantage-header h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: white;
+        }
+
+        .vantage-subtitle {
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.9;
+            color: #F7FAFC;
+        }
+
+        .vantage-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .vantage-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            color: #F7FAFC;
+        }
+
+        .vantage-cta {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .vantage-cta p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .archetype-executive-section {
+            
+
+            border-radius: 12px;
+
+            margin-bottom: 2rem;
+        }
+
+        .archetype-executive-section h2 {
+            color: var(--vertria-primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .executive-summary {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .executive-summary h3 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .executive-summary p {
+            color: #4A5568;
+            line-height: 1.7;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .archetype-explanation {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(87, 31, 39, 0.1);
+        }
+
+        .archetype-explanation p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .unified-summary {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgb(255, 255, 255);
+            border-radius: 12px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .unified-summary h3 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .unified-summary p {
+            color: #4A5568;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .unified-summary p:last-child {
+            margin-bottom: 0;
+        }
+
+        .unified-gauge-section {
+            background: rgb(255, 255, 255);
+            
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .unified-gauge-section h2 {
+            color: var(--vertria-primary);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .unified-gauge-tile {
+            background: rgba(255, 255, 255, 0.95);
+
+            border-radius: 12px;
+        }
+
+        .gauge-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .gauge-header h3 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .gauge-header .guidance-text {
+            margin-bottom: 1rem;
+        }
+
+        .gauge-header .guidance-text p {
+            color: #4A5568;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .combined-descriptions {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .strengths-description,
+        .growth-description {
+            padding: 1rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .strengths-description p,
+        .growth-description p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .strengths-layout,
+        .growth-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .strengths-gauges,
+        .growth-gauges {
+            width: 100%;
+        }
+
+        .strengths-text,
+        .growth-text {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+            text-align: center;
+        }
+
+        .strengths-text p,
+        .growth-text p {
+            color: #4A5568;
+            line-height: 1.4;
+            font-size: 0.9rem;
+            margin: 0;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .gauge-subsection h3 {
+            color: var(--vertria-primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .gauge-subsection .guidance-text {
+            margin-bottom: 1rem;
+        }
+
+        .gauge-subsection .guidance-text p {
+            color: #4A5568;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .gauge-subsection .strengths-description,
+        .gauge-subsection .growth-description {
+            margin-top: 1rem;
+        }
+
+        .gauge-subsection .strengths-description p,
+        .gauge-subsection .growth-description p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .combined-descriptions {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .unified-gauge-tile {
+                padding: 0px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .report-content {
+                padding: 0px;
+            }
+
+            .stage-container {
+                grid-template-columns: 1fr;
+            }
+
+            .trait-highlights {
+                grid-template-columns: 1fr;
+            }
+
+            .gauge-charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container .plotly-graph-div {
+                height: 350px !important;
+                border-radius: 0px;
+            }
+
+            .strengths-layout,
+            .growth-layout {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .strengths-gauges,
+            .growth-gauges {
+                flex: 1;
+                max-width: 100%;
+            }
+
+            .strengths-text,
+            .growth-text {
+                flex: 1;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chart-container .plotly-graph-div {
+                height: 300px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-container">
+      
+        <!-- Page 1: Cover/Intro -->
+        <div class="bg-[#570F27] text-white p-8 rounded-2xl mx-4 my-6 relative overflow-hidden">
+            <!-- Background pattern overlay -->
+            <!-- <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-4 right-4 w-16 h-16 bg-yellow-400 rounded-full"></div>
+                <div class="absolute bottom-8 left-8 w-8 h-8 bg-yellow-300 rounded-full"></div>
+                <div class="absolute top-1/2 right-1/4 w-4 h-4 bg-yellow-200 rounded-full"></div>
+            </div>
+  -->
+            <!-- Header Content -->
+            <div class="relative z-10">
+                <!-- Top Row: Name and Logo -->
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-4xl font-bold text-white mb-2">Victoria Raish</h1>
+                        <p class="text-yellow-100 text-lg">Your personalized entrepreneurial journey begins here</p>
+                    </div>
+                    
+                </div>
+ 
+                <!-- Archetype Section -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex-1">
+                        <div
+                            class="inline-block bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-semibold mb-3">
+                            Your Archetype
+                        </div>
+                        <h2 class="text-5xl font-bold text-white mb-3">Resilient Leadership</h2>
+                        <p>You took the first step by completing the assessment. Now let us help you along your
+                            journey by detailing where you are and where you could go.</p>
+                        <p>"The journey of a thousand miles begins with a single step." — Lao Tzu</p>
+ 
+                    </div>
+ 
+                    <!-- Match Percentage Circle -->
+                    <div class="flex flex-col items-center ml-8">
+                        <div class="relative w-32 h-32 mb-4">
+                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                                <!-- Background circle -->
+                                <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="8" fill="none" />
+                                <!-- Progress circle -->
+                                <circle cx="50" cy="50" r="40" stroke="#FCD34D" stroke-width="8" fill="none"
+                                    stroke-dasharray="208.58099999999996" stroke-dashoffset="0"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-white">83.1%</div>
+                                    <div class="text-yellow-200 text-sm">Match</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-yellow-200 text-sm text-center">
+                            Created on October 21, 2025
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- Core Strength Section -->
+                <div class="bg-red-800 bg-opacity-50 p-6 rounded-xl border-t border-red-700">
+                    <div class="flex items-start">
+                        <div class="text-yellow-400 text-2xl mr-4">⭐</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Core Strength</h3>
+                            <p class="text-yellow-100 leading-relaxed">
+                                Your strongest alignment is with Resilient Leadership, showing high potential to lead
+                                through creativity and forward vision.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-content bg-[#F8F8F9]">
+            <!-- Page 2: Archetype & Executive Summary -->
+            <div class="section">
+                <div class="archetype-executive-section">
+                    <h2>Archetype: Resilient Leadership</h2>
+                    <!-- <div class="archetype-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 83.1%"></div>
+                        </div>
+                        <div class="progress-text">83.1% Match</div>
+                    </div> -->
+
+                    <div class="unified-summary">
+                        <h3>Executive Summary</h3>
+                        <p>The Resilient Leadership archetype in entrepreneurship embodies individuals who demonstrate unwavering perseverance, adaptability, and determination in the face of challenges. These entrepreneurs possess practical characteristics such as mental toughness, the ability to pivot quickly, and a strong sense of optimism. They approach business challenges as opportunities for growth and learning, leveraging setbacks as fuel for innovation and progress in their ventures.</p>
+                        <p>The individual's statement about being "ready to explore if entrepreneurship is part of my story" reflects a sense of resilience in their willingness to embark on a new journey despite uncertainties. Their focus on "making connections that other people do not make" demonstrates a resilient leadership trait of seeing opportunities where others may not. Additionally, their vision of entrepreneurship being "more about making a difference" aligns with the archetype's emphasis on creating a positive impact. To further embody the Resilient Leadership archetype, they could channel their fear of financial instability into proactive planning and strategic decision-making to ensure both personal and professional stability.</p>
+                    </div>
+                    <div class="archetype-traits">
+                        <h1 style="font-size: 1.1rem; font-weight: bold;" >Key Traits for Resilient Leadership:</h1>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
+                                <strong class="text-red-800 text-lg block mb-2">Resilience and Grit</strong>
+                                <p class="text-gray-600 text-[0.95rem] leading-relaxed">You have a strong ability to persevere through challenges and remain committed despite difficulties. In entrepreneurship, this is one of the defining qualities of success. Ventures rarely follow a straight line — setbacks, delays, and disappointments are inevitable. Your resilience ensures that these obstacles become temporary detours rather than permanent roadblocks. Entrepreneurs with grit bring a unique energy to their work. They stay focused on long-term goals while adapting to short-term setbacks, showing persistence when others might give up. Your ability to push forward not only drives your own progress but also inspires confidence in those around you. Teams, investors, and partners trust leaders who keep going when things get hard. The key for you is to continue using resilience not just as endurance, but as a source of momentum. Entrepreneurship rewards those who can recover quickly, learn from challenges, and keep moving with determination. Your grit positions you as someone who will keep showing up until the vision becomes reality.</p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
+                                <strong class="text-red-800 text-lg block mb-2">Team Building</strong>
+                                <p class="text-gray-600 text-[0.95rem] leading-relaxed">You excel at uniting people and fostering collaborative environments. In entrepreneurship, this is one of the most critical skills — no venture grows alone. Your strength in team building allows you to harness diverse talents, align them with a shared vision, and generate momentum that individuals could not achieve on their own. Strong team builders understand that success comes from both skill and culture. You not only gather capable people but also foster trust, clarity, and motivation within the group. This makes others want to contribute their best work, knowing they are part of something meaningful. Your ability to unite people around a common purpose gives your venture staying power, even in uncertain times. The key for you is to continue seeing team building not just as assembling people, but as cultivating a community of shared ownership. When everyone feels valued and aligned, challenges become easier to overcome and wins feel amplified. Entrepreneurship rewards leaders who create strong teams, and your ability in this area sets you apart as someone capable of building more than just a business — you build belonging.</p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
+                                <strong class="text-red-800 text-lg block mb-2">Adaptability</strong>
+                                <p class="text-gray-600 text-[0.95rem] leading-relaxed">You have a strong ability to quickly adjust to changing conditions and stay steady amid uncertainty. In entrepreneurship, this is one of the most valuable traits you can possess. Markets shift, customers evolve, and technologies disrupt entire industries. Your adaptability ensures that instead of resisting change, you can pivot with it and find opportunity where others see only instability. Adaptable entrepreneurs thrive because they stay curious and open-minded. You have the ability to reframe challenges as possibilities and adjust your approach without losing sight of the bigger vision. This agility not only helps you survive but also positions you to lead in fast-moving environments. Your flexibility inspires confidence in others, showing that you can navigate turbulence without losing focus. The key for you is to continue seeing adaptability not as reaction but as strategic evolution. Entrepreneurship rewards leaders who can bend without breaking, and your strength in this area makes you someone capable of guiding ventures through change while keeping momentum alive.</p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
+                                <strong class="text-red-800 text-lg block mb-2">Risk-Taking</strong>
+                                <p class="text-gray-600 text-[0.95rem] leading-relaxed">You have a high propensity for embracing uncertainty and exploring the unknown. This is one of the most powerful traits in entrepreneurship, where nothing is guaranteed and every decision carries weight. Your comfort with risk positions you as someone willing to explore opportunities others might overlook. Risk-taking fuels innovation. It is the spark behind launching new products, testing unproven markets, or challenging established competitors. By leaning into risk, you not only generate possibilities for yourself but also inspire confidence in those around you — investors, teammates, and partners see your boldness as a sign of vision and momentum. The key for you is to keep this strength intentional. Channel your appetite for risk into experiments with clear learning goals, not blind leaps. When courage is paired with clarity, you create the kind of sustainable growth that makes entrepreneurship more than a gamble — it becomes a pathway forward.</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- Archetype Trait Scores Heatmap -->
+                    <div class="heatmap-section">
+                        <h4>Archetype-Trait Correlation</h4>
+                        <!-- <div class="guidance-text">
+                            <p><strong>This heatmap shows how your personality traits correlate with different
+                                    entrepreneurial archetypes, helping explain why the Resilient Leadership archetype
+                                    was selected for you.</strong></p>
+                        </div> -->
+                        <div class="">
+                            <p><strong>This heatmap shows how your personality traits correlate with different
+                                entrepreneurial archetypes, helping explain why the Resilient Leadership archetype
+                                was selected for you.</strong></p>
+                            <div>                            <div id="archetype-heatmap" class="plotly-graph-div" style="height:400px; width:800px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("archetype-heatmap")) {                    Plotly.newPlot(                        "archetype-heatmap",                        [{"colorbar":{"len":0.8,"thickness":25,"tickmode":"array","ticktext":["Low","Low-Med","Medium","High","Very High","Perfect"],"tickvals":[0,0.2,0.4,0.6,0.8,1.0],"title":{"text":"Trait\u003cbr\u003eScore"},"x":1.02,"xpad":10},"colorscale":[[0.0,"#FFFFFF"],[0.2,"#E6F3FF"],[0.4,"#CCE7FF"],[0.6,"#99CFFF"],[0.8,"#66B7FF"],[1.0,"#339FFF"]],"hoverinfo":"text","hovertemplate":"\u003cb\u003e%{y}\u003c\u002fb\u003e\u003cbr\u003e%{x}\u003cbr\u003eTrait Score: %{z:.2f}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","hovertext":[["0.35","0.32","0.94","0.36","0.28","0.88","0.32","0.83","0.84","0.34","0.33","0.34"],["0.85","0.32","0.32","0.32","0.15","0.72","0.33","0.33","0.32","0.32","0.32","0.32"],["0.35","0.82","0.32","0.39","0.26","0.26","0.33","0.32","0.84","0.33","0.84","0.45"],["0.85","0.82","0.32","0.38","0.28","0.38","0.32","0.83","0.32","0.84","0.83","0.34"],["0.35","0.32","0.32","0.88","0.45","0.85","0.33","0.84","0.34","0.83","0.34","0.28"]],"showscale":true,"text":[["0.35","0.32","0.94","0.36","0.28","0.88","0.32","0.83","0.84","0.34","0.33","0.34"],["0.85","0.32","0.32","0.32","0.15","0.72","0.33","0.33","0.32","0.32","0.32","0.32"],["0.35","0.82","0.32","0.39","0.26","0.26","0.33","0.32","0.84","0.33","0.84","0.45"],["0.85","0.82","0.32","0.38","0.28","0.38","0.32","0.83","0.32","0.84","0.83","0.34"],["0.35","0.32","0.32","0.88","0.45","0.85","0.33","0.84","0.34","0.83","0.34","0.28"]],"textfont":{"color":"black","family":"Arial, sans-serif","size":12,"weight":"bold"},"texttemplate":"%{text}","x":["Resilience & Grit","Servant Leadership","Emotional Intelligence","Decision Making","Problem Solving","Drive & Ambition","Innovation & Orientation","Adaptability","Critical Thinking","Team Building","Risk Taking","Accountability"],"y":["Adaptive Intelligence","Ambitious Drive","Collaborative Responsibility","Resilient Leadership","Strategic Innovation"],"z":[[0.35,0.32,0.94,0.36,0.28,0.88,0.32,0.83,0.84,0.34,0.33,0.34],[0.85,0.32,0.32,0.32,0.15,0.72,0.33,0.33,0.32,0.32,0.32,0.32],[0.35,0.82,0.32,0.39,0.26,0.26,0.33,0.32,0.84,0.33,0.84,0.45],[0.85,0.82,0.32,0.38,0.28,0.38,0.32,0.83,0.32,0.84,0.83,0.34],[0.35,0.32,0.32,0.88,0.45,0.85,0.33,0.84,0.34,0.83,0.34,0.28]],"zmax":1,"zmin":0,"type":"heatmap"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"shapes":[{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":-0.5,"x1":0.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":0.5,"x1":1.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":1.5,"x1":2.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":2.5,"x1":3.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":3.5,"x1":4.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":4.5,"x1":5.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":5.5,"x1":6.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":6.5,"x1":7.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":7.5,"x1":8.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":8.5,"x1":9.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":9.5,"x1":10.5,"y0":2.5,"y1":3.5},{"fillcolor":"rgba(0,0,0,0)","layer":"above","line":{"color":"black","width":3},"type":"rect","x0":10.5,"x1":11.5,"y0":2.5,"y1":3.5}],"title":{"font":{"size":14,"color":"#2c3e50"},"text":"Trait Scores by Archetype\u003cbr\u003e\u003csub\u003eDetected: Resilient Leadership (Highlighted)\u003c\u002fsub\u003e","x":0.5},"xaxis":{"tickfont":{"size":9},"title":{"text":"Personality Traits","font":{"size":11}},"tickangle":45},"yaxis":{"tickfont":{"size":9},"title":{"text":"Entrepreneurial Archetypes","font":{"size":11}}},"font":{"family":"Arial, sans-serif"},"margin":{"l":80,"r":40,"t":60,"b":80},"height":400,"width":800,"paper_bgcolor":"#FEFEFE","plot_bgcolor":"#FAFAFA","autosize":true,"annotations":[{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.35","x":0,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":1,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.94","x":2,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.36","x":3,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.28","x":4,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.88","x":5,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":6,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.83","x":7,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.84","x":8,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.34","x":9,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":10,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.34","x":11,"xref":"x","y":0,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.85","x":0,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":1,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":2,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":3,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.15","x":4,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.72","x":5,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":6,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":7,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":8,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":9,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":10,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":11,"xref":"x","y":1,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.35","x":0,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.82","x":1,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":2,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.39","x":3,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.26","x":4,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.26","x":5,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":6,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":7,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.84","x":8,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":9,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.84","x":10,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.45","x":11,"xref":"x","y":2,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.85","x":0,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.82","x":1,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":2,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.38","x":3,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.28","x":4,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.38","x":5,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":6,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.83","x":7,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":8,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.84","x":9,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.83","x":10,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.34","x":11,"xref":"x","y":3,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.35","x":0,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":1,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.32","x":2,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.88","x":3,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.45","x":4,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.85","x":5,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.33","x":6,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.84","x":7,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.34","x":8,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.83","x":9,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.34","x":10,"xref":"x","y":4,"yref":"y"},{"font":{"color":"black","family":"Arial, sans-serif","size":12},"showarrow":false,"text":"0.28","x":11,"xref":"x","y":4,"yref":"y"}]},                        {"responsive": true}                    )                };            </script>        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 4: Assessment Metrics -->
+             <!-- <div class="p-2 bg-red-700">
+                <div class="section">
+                    <h2>Your Results at a Glance</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">🔗</div>
+                            <div class="metric-value">83.1%</div>
+                            <div class="metric-label">Archetype Match</div>
+                            <div class="metric-explanation">Your strongest alignment is with Resilient Leadership, showing high potential to lead through creativity and forward vision</div>
+                        </div>
+                    </div>
+                </div>
+
+             </div> -->
+            
+
+            <!-- Page 5: Entrepreneurial Stage -->
+            
+
+            <!-- Page 6: Trait Analysis -->
+            <div class="section">
+
+                <div class="section border-2 p-3 bg-white">
+                    <h2 style="font-size: 1.5rem; font-weight: bold;">Entrepreneurial Stage</h2>
+                    <div class="stage-container">
+                        <div class="stage-highlight1 discover">
+                            <h3 style="font-size: 1.2rem; font-weight: bold;" >Discover</h3>
+                            <p style="font-size: 0.9rem; font-weight: bold;">You want to understand how entrepreneurial energy shapes your path. This stage is about self-discovery, building awareness, and connecting your natural strengths to potential opportunities.</p>
+                        </div>
+                        <div class="stage-definitions">
+                            <div class="stage-definition ">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Build:</strong> You have a business idea and are ready to bring it to life.
+                            </div>
+                            <div class="stage-definition ">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Explore:</strong> You're curious if entrepreneurship fits your story.
+                            </div>
+                            <div class="stage-definition active">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Discover:</strong> You want to understand how entrepreneurial energy shapes your
+                                path.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Trait Insights</h2>
+                <div class="guidance-text">
+                    <p><strong>This radar chart shows your complete trait profile. Each axis represents one of the 18
+                            entrepreneurial traits. The closer to the edge, the stronger that trait. Use this to
+                            identify patterns and understand your overall entrepreneurial profile.</strong></p>
+                </div>
+                <div class="chart-container">
+                   
+                    <div>                            <div id="trait-radar" class="plotly-graph-div" style="height:500px; width:600px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("trait-radar")) {                    Plotly.newPlot(                        "trait-radar",                        [{"fill":"toself","fillcolor":"rgba(87, 15, 39, 0.3)","line":{"color":"#570F27"},"name":"Trait Scores","r":[0.7111111111111111,0.74,0.5166666666666667,0.7000000000000001,0.6333333333333334,0.6,0.6000000000000001,0.6,0.6625,0.8444444444444444,0.788888888888889,0.82,0.7100000000000001,0.8800000000000001,0.6375000000000001,0.35,0.82],"theta":["Introversion and Extroversion","Decision-Making","Relationship-Building","Negotiation","Critical Thinking","Problem-Solving","Accountability","Emotional Intelligence","Conflict Resolution","Team Building","Servant Leadership","Adaptability","Approach to Failure","Resilience and Grit","Innovation Orientation","Drive and Ambition","Risk-Taking"],"type":"scatterpolar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"polar":{"radialaxis":{"tickfont":{"size":10},"visible":true,"range":[0,1]}},"font":{"family":"Arial, sans-serif"},"showlegend":true,"title":{"text":"Trait Profile Radar Chart"},"height":500,"width":600},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+
+            </div>
+
+            <!-- Page 7: Strengths & Growth Opportunities -->
+            <div class="section">
+                <div class="unified-gauge-section">
+                    <h2 class=" text-[#570F27]">Strengths & Growth Opportunities</h2>
+
+                    <!-- Combined Gauge Section -->
+                    <div class="unified-gauge-tile">
+                        <!-- Strengths Section with Side Text -->
+                        <div class="strengths-section">
+                            
+                            <div class="strengths-layout">
+                                <div class="gauge-header">
+                                    <h3>Your Strengths</h3>
+                                    <div class="guidance-text mb-3">
+                                        <p><strong>These gauges show your strongest traits. Higher scores indicate areas
+                                                where you naturally excel in entrepreneurial contexts.</strong></p>
+                                    </div>
+                                </div>
+                                <div class="strengths-gauges">
+                                    <div>                            <div id="trait-gauges" class="plotly-graph-div" style="height:300px; width:800px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("trait-gauges")) {                    Plotly.newPlot(                        "trait-gauges",                        [{"domain":{"x":[0.0,0.2888888888888889],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#570F27"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FEF2F2","range":[0,20]},{"color":"#FED7D7","range":[20,40]},{"color":"#FBB6CE","range":[40,60]},{"color":"#F687B3","range":[60,80]},{"color":"#ED64A6","range":[80,100]}],"threshold":{"line":{"color":"#E53E3E","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Resilience and Grit"},"value":88.0,"type":"indicator"},{"domain":{"x":[0.35555555555555557,0.6444444444444445],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#570F27"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FEF2F2","range":[0,20]},{"color":"#FED7D7","range":[20,40]},{"color":"#FBB6CE","range":[40,60]},{"color":"#F687B3","range":[60,80]},{"color":"#ED64A6","range":[80,100]}],"threshold":{"line":{"color":"#E53E3E","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Team Building"},"value":84.4,"type":"indicator"},{"domain":{"x":[0.7111111111111111,1.0],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#570F27"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FEF2F2","range":[0,20]},{"color":"#FED7D7","range":[20,40]},{"color":"#FBB6CE","range":[40,60]},{"color":"#F687B3","range":[60,80]},{"color":"#ED64A6","range":[80,100]}],"threshold":{"line":{"color":"#E53E3E","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Adaptability"},"value":82.0,"type":"indicator"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"font":{"family":"Arial, sans-serif","size":10},"margin":{"l":20,"r":20,"t":40,"b":20},"title":{"text":"Top 3 Trait Scores"},"height":300,"width":800,"paper_bgcolor":"white","plot_bgcolor":"white"},                        {"responsive": true}                    )                };            </script>        </div>
+                                </div>
+                                <div class="strengths-text">
+                                    <div class="trait-explanation">
+                                        <p>The combination of resilience and grit, team building, and adaptability forms a powerful trio that propels entrepreneurial success. Resilience allows you to push through challenges and setbacks, while team building enables you to unite diverse talents towards a common goal. Adaptability ensures you can pivot and thrive in ever-changing environments. Together, these strengths create a foundation for enduring success, inspiring confidence in your ability to lead through adversity and uncertainty.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth Section with Full Space Text -->
+                        <div class="growth-section">
+                            <div class="gauge-header">
+                                <h3>Growth Opportunities</h3>
+                                <div class="guidance-text">
+                                    <p><strong>These gauges highlight areas for development. Focus on these traits to
+                                            strengthen your overall entrepreneurial profile.</strong></p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 gap-6 mb-8">
+                                <div class="w-full">
+                                    <div>                            <div id="growth-opportunities-gauges" class="plotly-graph-div" style="height:300px; width:800px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("growth-opportunities-gauges")) {                    Plotly.newPlot(                        "growth-opportunities-gauges",                        [{"domain":{"x":[0.0,0.2888888888888889],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#F57F17"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FFF8E1","range":[0,20]},{"color":"#FFECB3","range":[20,40]},{"color":"#FFE082","range":[40,60]},{"color":"#FFD54F","range":[60,80]},{"color":"#FFC107","range":[80,100]}],"threshold":{"line":{"color":"#E65100","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Drive and Ambition"},"value":35.0,"type":"indicator"},{"domain":{"x":[0.35555555555555557,0.6444444444444445],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#F57F17"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FFF8E1","range":[0,20]},{"color":"#FFECB3","range":[20,40]},{"color":"#FFE082","range":[40,60]},{"color":"#FFD54F","range":[60,80]},{"color":"#FFC107","range":[80,100]}],"threshold":{"line":{"color":"#E65100","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Relationship-Building"},"value":51.7,"type":"indicator"},{"domain":{"x":[0.7111111111111111,1.0],"y":[0,1]},"gauge":{"axis":{"range":[null,100],"tickcolor":"#2D3748","tickwidth":2},"bar":{"color":"#F57F17"},"bgcolor":"white","bordercolor":"#E2E8F0","borderwidth":3,"steps":[{"color":"#FFF8E1","range":[0,20]},{"color":"#FFECB3","range":[20,40]},{"color":"#FFE082","range":[40,60]},{"color":"#FFD54F","range":[60,80]},{"color":"#FFC107","range":[80,100]}],"threshold":{"line":{"color":"#E65100","width":4},"thickness":0.8,"value":90}},"mode":"gauge+number","number":{"font":{"color":"#570F27","size":16},"suffix":"%"},"title":{"font":{"size":10},"text":"Emotional Intelligence"},"value":60.0,"type":"indicator"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"font":{"family":"Arial, sans-serif"},"margin":{"l":20,"r":20,"t":40,"b":20},"height":300,"width":800,"paper_bgcolor":"white","plot_bgcolor":"white"},                        {"responsive": true}                    )                };            </script>        </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    
+                                    <div class="border-2 border-orange-400 rounded-lg p-6 bg-orange-50">
+                                        <h4 class="text-orange-600 font-bold text-lg mb-3">Drive and Ambition</h4>
+                                        <p class="text-gray-700 text-sm leading-relaxed">Your results suggest that drive and ambition may not feel as strong for you right now, which can make the entrepreneurial journey seem more uncertain or overwhelming. In entrepreneurship, energy and determination often make the difference between an idea that fades and a business that grows.</p>
+                                    </div>
+                                    
+                                    <div class="border-2 border-orange-400 rounded-lg p-6 bg-orange-50">
+                                        <h4 class="text-orange-600 font-bold text-lg mb-3">Relationship-Building</h4>
+                                        <p class="text-gray-700 text-sm leading-relaxed">Your results suggest that relationship building may not come as naturally to you. In entrepreneurship, this can sometimes make the journey feel heavier, since opportunities and support often flow through networks of people.</p>
+                                    </div>
+                                    
+                                    <div class="border-2 border-orange-400 rounded-lg p-6 bg-orange-50">
+                                        <h4 class="text-orange-600 font-bold text-lg mb-3">Emotional Intelligence</h4>
+                                        <p class="text-gray-700 text-sm leading-relaxed">Your results suggest that emotional intelligence may feel more challenging for you, particularly when it comes to reading emotions or responding effectively in high-pressure situations. In entrepreneurship, this can create blind spots, as so much of success depends on trust, communication, and human connection.</p>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 8: Complete Visualizations -->
+            <div class="section">
+                <h2>Complete Trait Profile Visualization</h2>
+                <div class="guidance-text">
+                    <p><strong>This bar chart provides a comprehensive view of all 18 traits. Red bars indicate growth
+                            opportunities , while green bars show your strengths. Use this to
+                            prioritize your development efforts.</strong></p>
+                </div>
+                <div class="chart-container1">
+                    <div>                            <div id="trait-bars" class="plotly-graph-div" style="height:610px; width:900px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("trait-bars")) {                    Plotly.newPlot(                        "trait-bars",                        [{"marker":{"color":["#2E8B57","#2E8B57","#2E8B57","#2E8B57","#2E8B57","#2E8B57","#2E8B57","#2E8B57","#2E8B57","#FFA500","#FFA500","#FFA500","#FFA500","#FFA500","#FFA500","#FFA500","#DC143C"]},"orientation":"h","text":["0.88","0.84","0.82","0.82","0.79","0.74","0.71","0.71","0.70","0.66","0.64","0.63","0.60","0.60","0.60","0.52","0.35"],"textfont":{"color":"white","size":11,"weight":"bold"},"textposition":"inside","x":[0.8800000000000001,0.8444444444444444,0.82,0.82,0.788888888888889,0.74,0.7111111111111111,0.7100000000000001,0.7000000000000001,0.6625,0.6375000000000001,0.6333333333333334,0.6000000000000001,0.6,0.6,0.5166666666666667,0.35],"y":["Resilience and Grit","Team Building","Adaptability","Risk-Taking","Servant Leadership","Decision-Making","Introversion and Extroversion","Approach to Failure","Negotiation","Conflict Resolution","Innovation Orientation","Critical Thinking","Accountability","Emotional Intelligence","Problem-Solving","Relationship-Building","Drive and Ambition"],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"annotations":[{"align":"right","bgcolor":"rgba(255,255,255,0.9)","bordercolor":"gray","borderwidth":1,"font":{"size":11},"showarrow":false,"text":"\u003cb\u003eScore Levels:\u003c\u002fb\u003e\u003cbr\u003e\u003cspan style='color:#2E8B57'\u003e\u25cf\u003c\u002fspan\u003e High (\u22650.70)\u003cbr\u003e\u003cspan style='color:#FFA500'\u003e\u25cf\u003c\u002fspan\u003e Medium (0.50-0.70)\u003cbr\u003e\u003cspan style='color:#DC143C'\u003e\u25cf\u003c\u002fspan\u003e Low (\u003c0.50)","x":0.98,"xanchor":"right","xref":"paper","y":0.98,"yanchor":"top","yref":"paper"}],"font":{"family":"Arial, sans-serif"},"margin":{"l":180,"r":60,"t":40,"b":40},"title":{"text":"Trait Scores Ranking"},"xaxis":{"title":{"text":"Score"}},"yaxis":{"title":{"text":"Traits"}},"height":610,"width":900,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+                </div>
+            </div>
+
+            <!-- Page 9: Archetype Activation Section -->
+
+
+            <div class="section">
+                <div class="archetype-activation-section">
+                    <h2>Nest Steps With Vertria</h2>
+                    <p class="whitespace-pre-line">Your results confirm your strength as a Resilient Leadership — someone who thrives under pressure, adapts quickly to change, and inspires others with unwavering determination. These qualities position you to lead with empathy and strength, turning adversity into growth opportunities and setbacks into stepping stones for success.
+
+The next step is to activate these strengths through Vertria Vantage — a dynamic experience that transforms insights into practice. Here you'll engage in challenges that simulate high-pressure scenarios, expand your ability to innovate under constraint, and translate your purpose into tangible strategies. You'll also step into a trusted network of peers and mentors who will walk beside you as you grow.
+
+Don't stop at insight. Step into Vertria Vantage, the next stage of your journey where your assessment comes alive — connecting you with the right opportunities, mentors, and challenges to activate your entrepreneurial advantage.</p>
+                </div>
+            </div>
+
+            <!-- Page 11: Community & Next Steps -->
+            <div class="section">
+                <div class="community-next-steps">
+                    <h2>Next Steps with Vertria – Discover Phase</h2>
+                    <div class="growth-opportunities-box">
+                        <p>You're uncovering how entrepreneurial energy shapes your personal and professional path. This phase is about self-discovery and connecting the dots between who you are and what you could build.</p>
+                    </div>
+                    <div class="vantage-section">
+                        <div class="vantage-header">
+                            <h3>🎯 Vertria Vantage</h3>
+                            <div class="vantage-subtitle">Your Personalized Pathway to Entrepreneurial Excellence</div>
+                        </div>
+                        <div class="vantage-content">
+                            <p>Think of us as your guide through uncharted territory. We'll help you uncover how your energy, skills, and passions can align with entrepreneurial opportunities.</p>
+                            <div class="vantage-cta">
+                                <p><strong>Ready to transform your growth areas into strengths?</strong> Vertria Vantage
+                                    provides the expert guidance and personalized support you need to accelerate your
+                                    entrepreneurial journey.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mentors-section">
+                        <h3>Mentors</h3>
+                        <p>Connect with leaders who use entrepreneurial thinking in diverse careers — not just startups. Their guidance can show you how entrepreneurship is a mindset as much as a career choice.</p>
+                    </div>
+                    <div class="community-section">
+                        <h3>Community</h3>
+                        <div class="community-items">
+                            
+                            <div class="community-item">
+                                <strong>Courses:</strong> Exploratory programs on leadership, creativity, and durable skills.
+                            </div>
+                            
+                            <div class="community-item">
+                                <strong>Events:</strong> Community conversations about resilience, adaptability, and vision.
+                            </div>
+                            
+                            <div class="community-item">
+                                <strong>Networking:</strong> Broader networks that encourage you to experiment with different roles and directions.
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reflection Questions -->
+        <div class="section">
+            <div class="reflection-questions">
+                <h2>Reflection Questions</h2>
+                <p class="reflection-intro">These reflection questions are only the beginning of your journey. Now that
+                    you've had time to digest your entrepreneurial report, it's time to start digging deeper. These
+                    reflection questions are designed to help you begin that work. At Vertria, we look forward to
+                    supporting you on the journey.</p>
+                <div class="questions-list">
+                    <div class="question-item">1. What surprised you most about your archetype?</div>
+                    <div class="question-item">2. How do your top traits show up in daily life?</div>
+                    <div class="question-item">3. Which growth area resonates with you most?</div>
+                    <div class="question-item">4. How might entrepreneurship fit into your future story?</div>
+                    <div class="question-item">5. What aspects of your current work align with entrepreneurial thinking?
+                    </div>
+                    <div class="question-item">6. How might you develop your entrepreneurial mindset further?</div>
+                    <div class="question-item">7. Did you notice any conflicts between traits?</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            <p>"The future belongs to those who act boldly."</p>
+            <p>© Vertria | info@vertria.com</p>
+            <p>
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-current font-bold mr-1.5 align-middle">©</span>
+                2025 Vertria. All rights reserved
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

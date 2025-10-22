@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertria Entrepreneurial Assessment - {{ person_name }}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --vertria-burgundy: #570F27;
+            --vertria-dark-blue: #151A4A;
+            --vertria-yellow: #FFDC58;
+            --vertria-deep-burgundy: #240610;
+            --vertria-light-burgundy: #8B2545;
+            --vertria-accent-blue: #2E4A7A;
+            --vertria-background: #FEFEFE;
+            --vertria-light-gray: #F8F9FA;
+            --vertria-text-dark: #2D3748;
+            --vertria-text-medium: #4A5568;
+            --vertria-text-light: #718096;
+            --vertria-primary: #570F27;
+            --vertria-secondary: #8B2545;
+            --vertria-success: #38A169;
+            --vertria-warning: #D69E2E;
+            --vertria-danger: #E53E3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.5;
+            color: var(--vertria-text-dark);
+            background-color: var(--vertria-background);
+            font-size: 13px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        .report-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            overflow: hidden;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-deep-burgundy) 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .company-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-quote {
+            font-style: italic;
+            color: #FFE888;
+            margin-top: 0.75rem;
+        }
+
+        .intro-line {
+            margin-top: 0.5rem;
+            color: #FFE888;
+        }
+
+        .report-title {
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .person-name {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .report-date {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .archetype-subheader {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--vertria-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .report-content {
+            padding: 2.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, var(--vertria-light-gray) 0%, #F0F2F5 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-primary);
+        }
+
+        .interpretation-guide {
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-accent-blue);
+            margin-bottom: 2rem;
+        }
+
+        .interpretation-guide h3 {
+            color: var(--vertria-accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .personalized-insights {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-accent-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .personalized-insights h3 {
+            color: var(--vertria-accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .primary-archetype {
+            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-light-burgundy) 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .archetype-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--vertria-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .archetype-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FFE888;
+            margin-bottom: 1rem;
+        }
+
+        .archetype-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--vertria-light-gray);
+            box-shadow: 0 2px 8px rgba(46, 74, 122, 0.05);
+        }
+
+        .metric-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--vertria-primary);
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--vertria-primary);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--vertria-text-medium);
+            margin-top: 0.5rem;
+        }
+
+        .metric-explanation {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .trait-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: var(--vertria-light-gray);
+            border-radius: 6px;
+            border-left: 3px solid var(--vertria-primary);
+        }
+
+        .trait-name {
+            flex: 1;
+            font-weight: 500;
+            color: var(--vertria-text-dark);
+        }
+
+        .trait-score {
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-right: 1rem;
+            min-width: 60px;
+        }
+
+        .trait-bar-container {
+            flex: 2;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+
+        .trait-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .trait-bar.low {
+            background: linear-gradient(90deg, var(--vertria-danger), #FC8181);
+        }
+
+        .trait-bar.med {
+            background: linear-gradient(90deg, var(--vertria-warning), #F6E05E);
+        }
+
+        .trait-bar.high {
+            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container .plotly-graph-div {
+            width: 100% !important;
+            height: 418px !important;
+            max-width: 100%;
+        }
+
+        .strengths-gauges .plotly-graph-div,
+        .growth-gauges .plotly-graph-div {
+            width: 100% !important;
+            height: 300px !important;
+        }
+
+        .trait-explanation {
+            
+            
+            
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(87, 15, 39, 0.1);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .trait-explanation p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #2c3e50;
+            font-style: italic;
+            text-align: left;
+        }
+
+        .chart-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .guidance-text {
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            border-left: 4px solid var(--vertria-primary);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .guidance-text p {
+            margin: 0;
+            color: var(--vertria-text-dark);
+        }
+
+        .guidance-text strong {
+            color: var(--vertria-primary);
+            font-weight: 600;
+        }
+
+        .archetype-match-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+            border-radius: 12px;
+        }
+
+        .archetype-progress {
+            margin: 2rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--vertria-primary);
+        }
+
+        .archetype-traits {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            
+            border-radius: 8px;
+            
+        }
+
+        .archetype-traits h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .archetype-traits p {
+            margin: 0;
+            color: #2D3748;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .trait-definitions {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .trait-definition {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-yellow);
+        }
+
+        .trait-definition strong {
+            color: var(--vertria-primary);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .trait-definition p {
+            color: #4A5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Low-scoring trait styles */
+        .trait-definition.low-score {
+            background: #FFF8E1;
+            border-left: 4px solid #F57F17;
+        }
+
+        /* Growth opportunity boxes styling */
+        .stage-highlight.discover {
+            background: #FFF8E1;
+            border-left: 4px solid #F57F17;
+        }
+
+        .trait-definition.low-score strong {
+            color: #E65100;
+            font-weight: 700;
+        }
+
+        .trait-definition.low-score p {
+            color: #BF360C;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .heatmap-section {
+            margin-top: 2rem;
+           
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .heatmap-section h4 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .heatmap-section .guidance-text {
+            margin-bottom: 1.5rem;
+        }
+
+        .heatmap-section .guidance-text p {
+            color: #4A5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 525px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 525px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .chart-container1 {
+            display: flex;
+            justify-content: center;
+
+            min-height: 630px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .chart-container .plotly-graph-div {
+            max-width: 100%;
+            height: auto;
+            width: 100%;
+        }
+
+        .stage-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .stage-highlight {
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stage-highlight1 {
+            padding: 2rem;
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        .stage-highlight.build {
+            background: linear-gradient(135deg, #FED7D7 0%, #FEB2B2 100%);
+            border: 2px solid var(--vertria-danger);
+        }
+
+        .stage-highlight.explore {
+            background: linear-gradient(135deg, #BEE3F8 0%, #90CDF4 100%);
+            border: 2px solid var(--vertria-accent-blue);
+        }
+
+        .stage-highlight.discover {
+            background: #FFF8E1;
+            border: 2px solid #F57F17;
+        }
+
+        .stage-highlight h4 {
+            color: var(--vertria-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .stage-definitions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stage-definition {
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 8px;
+            border-left: 4px solid #E5E7EB;
+        }
+
+        .stage-definition.active {
+            background: var(--vertria-light-gray);
+            border-left-color: var(--vertria-primary);
+        }
+
+        .trait-highlights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .trait-highlight {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .gauge-charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .gauge-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(87, 15, 39, 0.05);
+        }
+
+        .gauge-section h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .growth-recommendations {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-yellow);
+        }
+
+        .recommendations-content {
+            margin-top: 1rem;
+        }
+
+        .recommendations-content p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .recommendations-content ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .recommendations-content li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .reflection-questions {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-accent-blue);
+        }
+
+        .reflection-intro {
+            font-style: italic;
+            margin-bottom: 2rem;
+            color: var(--vertria-text-medium);
+        }
+
+        .questions-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .question-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .archetype-activation-section {
+            background: rgba(87, 31, 39, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+            margin: 1.5rem 0;
+        }
+
+        .archetype-activation-section h2 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .archetype-activation-section p {
+            color: var(--vertria-text-dark);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .archetype-activation-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .community-next-steps {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 6px solid var(--vertria-yellow);
+        }
+
+        .growth-opportunities-box {
+            background: var(--vertria-yellow);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+
+        .vantage-section,
+        .mentors-section,
+        .community-section {
+            margin: 1.5rem 0;
+        }
+
+        .community-items {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .community-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-footer {
+            background: var(--vertria-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .report-footer p {
+            margin: 0.5rem 0;
+        }
+
+        .correlation-explanation {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(87, 15, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .correlation-explanation h3 {
+            color: var(--vertria-primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .correlation-explanation p {
+            color: #4A5568;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .growth-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .growth-section h3 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .growth-description {
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .growth-description p {
+            font-size: 1rem;
+            color: #4A5568;
+        }
+
+        .strengths-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .strengths-description {
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .strengths-description p {
+            font-size: 0.95rem;
+            color: #4A5568;
+        }
+
+        .vantage-section {
+            background: linear-gradient(135deg, #571F27 0%, #8B2A3A 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            box-shadow: 0 8px 25px rgba(87, 31, 39, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vantage-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .vantage-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .vantage-header h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: white;
+        }
+
+        .vantage-subtitle {
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.9;
+            color: #F7FAFC;
+        }
+
+        .vantage-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .vantage-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            color: #F7FAFC;
+        }
+
+        .vantage-cta {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .vantage-cta p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .archetype-executive-section {
+            
+
+            border-radius: 12px;
+
+            margin-bottom: 2rem;
+        }
+
+        .archetype-executive-section h2 {
+            color: var(--vertria-primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .executive-summary {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .executive-summary h3 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .executive-summary p {
+            color: #4A5568;
+            line-height: 1.7;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .archetype-explanation {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(87, 31, 39, 0.1);
+        }
+
+        .archetype-explanation p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .unified-summary {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgb(255, 255, 255);
+            border-radius: 12px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .unified-summary h3 {
+            color: var(--vertria-primary);
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .unified-summary p {
+            color: #4A5568;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .unified-summary p:last-child {
+            margin-bottom: 0;
+        }
+
+        .unified-gauge-section {
+            background: rgb(255, 255, 255);
+            
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .unified-gauge-section h2 {
+            color: var(--vertria-primary);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .unified-gauge-tile {
+            background: rgba(255, 255, 255, 0.95);
+
+            border-radius: 12px;
+        }
+
+        .gauge-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .gauge-header h3 {
+            color: var(--vertria-primary);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .gauge-header .guidance-text {
+            margin-bottom: 1rem;
+        }
+
+        .gauge-header .guidance-text p {
+            color: #4A5568;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .combined-descriptions {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .strengths-description,
+        .growth-description {
+            padding: 1rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+        }
+
+        .strengths-description p,
+        .growth-description p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .strengths-layout,
+        .growth-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .strengths-gauges,
+        .growth-gauges {
+            width: 100%;
+        }
+
+        .strengths-text,
+        .growth-text {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(87, 31, 39, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--vertria-primary);
+            text-align: center;
+        }
+
+        .strengths-text p,
+        .growth-text p {
+            color: #4A5568;
+            line-height: 1.4;
+            font-size: 0.9rem;
+            margin: 0;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .gauge-subsection h3 {
+            color: var(--vertria-primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .gauge-subsection .guidance-text {
+            margin-bottom: 1rem;
+        }
+
+        .gauge-subsection .guidance-text p {
+            color: #4A5568;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .gauge-subsection .strengths-description,
+        .gauge-subsection .growth-description {
+            margin-top: 1rem;
+        }
+
+        .gauge-subsection .strengths-description p,
+        .gauge-subsection .growth-description p {
+            color: #4A5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .combined-descriptions {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .unified-gauge-tile {
+                padding: 0px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .report-content {
+                padding: 0px;
+            }
+
+            .stage-container {
+                grid-template-columns: 1fr;
+            }
+
+            .trait-highlights {
+                grid-template-columns: 1fr;
+            }
+
+            .gauge-charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container .plotly-graph-div {
+                height: 350px !important;
+                border-radius: 0px;
+            }
+
+            .strengths-layout,
+            .growth-layout {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .strengths-gauges,
+            .growth-gauges {
+                flex: 1;
+                max-width: 100%;
+            }
+
+            .strengths-text,
+            .growth-text {
+                flex: 1;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chart-container .plotly-graph-div {
+                height: 300px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-container">
+      
+        <!-- Page 1: Cover/Intro -->
+        <div class="bg-[#570F27] text-white p-8 rounded-2xl mx-4 my-6 relative overflow-hidden">
+            <!-- Background pattern overlay -->
+            <!-- <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-4 right-4 w-16 h-16 bg-yellow-400 rounded-full"></div>
+                <div class="absolute bottom-8 left-8 w-8 h-8 bg-yellow-300 rounded-full"></div>
+                <div class="absolute top-1/2 right-1/4 w-4 h-4 bg-yellow-200 rounded-full"></div>
+            </div>
+  -->
+            <!-- Header Content -->
+            <div class="relative z-10">
+                <!-- Top Row: Name and Logo -->
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-4xl font-bold text-white mb-2">{{ person_name }}</h1>
+                        <p class="text-yellow-100 text-lg">Your personalized entrepreneurial journey begins here</p>
+                    </div>
+                    
+                </div>
+ 
+                <!-- Archetype Section -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex-1">
+                        <div
+                            class="inline-block bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-semibold mb-3">
+                            Your Archetype
+                        </div>
+                        <h2 class="text-5xl font-bold text-white mb-3">{{ archetype_name }}</h2>
+                        <p>You took the first step by completing the assessment. Now let us help you along your
+                            journey by detailing where you are and where you could go.</p>
+                        <p>"The journey of a thousand miles begins with a single step." — Lao Tzu</p>
+ 
+                    </div>
+ 
+                    <!-- Match Percentage Circle -->
+                    <div class="flex flex-col items-center ml-8">
+                        <div class="relative w-32 h-32 mb-4">
+                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                                <!-- Background circle -->
+                                <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="8" fill="none" />
+                                <!-- Progress circle -->
+                                <circle cx="50" cy="50" r="40" stroke="#FCD34D" stroke-width="8" fill="none"
+                                    stroke-dasharray="{{ archetype_score * 2.51 }}" stroke-dashoffset="0"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-white">{{ archetype_score }}%</div>
+                                    <div class="text-yellow-200 text-sm">Match</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-yellow-200 text-sm text-center">
+                            Created on {{ current_date }}
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- Core Strength Section -->
+                <div class="bg-red-800 bg-opacity-50 p-6 rounded-xl border-t border-red-700">
+                    <div class="flex items-start">
+                        <div class="text-yellow-400 text-2xl mr-4">⭐</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Core Strength</h3>
+                            <p class="text-yellow-100 leading-relaxed">
+                                Your strongest alignment is with {{ archetype_name }}, showing high potential to lead
+                                through creativity and forward vision.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-content bg-[#F8F8F9]">
+            <!-- Page 2: Archetype & Executive Summary -->
+            <div class="section">
+                <div class="archetype-executive-section">
+                    <h2>Archetype: {{ archetype_name }}</h2>
+                    <!-- <div class="archetype-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ archetype_score }}%"></div>
+                        </div>
+                        <div class="progress-text">{{ archetype_score }}% Match</div>
+                    </div> -->
+
+                    <div class="unified-summary">
+                        <h3>Executive Summary</h3>
+                        <p>{{ executive_summary_paragraph1 }}</p>
+                        <p>{{ executive_summary_paragraph2 }}</p>
+                    </div>
+                    <div class="archetype-traits">
+                        <h1 style="font-size: 1.1rem; font-weight: bold;" >Key Traits for {{ archetype_name }}:</h1>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            {% for trait in traits[:4] %}
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
+                                <strong class="text-red-800 text-lg block mb-2">{{ trait.name }}</strong>
+                                <p class="text-gray-600 text-[0.95rem] leading-relaxed">{{ trait.description }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Archetype Trait Scores Heatmap -->
+                    <div class="heatmap-section">
+                        <h4>Archetype-Trait Correlation</h4>
+                        <!-- <div class="guidance-text">
+                            <p><strong>This heatmap shows how your personality traits correlate with different
+                                    entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
+                                    was selected for you.</strong></p>
+                        </div> -->
+                        <div class="">
+                            <p><strong>This heatmap shows how your personality traits correlate with different
+                                entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
+                                was selected for you.</strong></p>
+                            {{ archetype_heatmap|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 4: Assessment Metrics -->
+             <!-- <div class="p-2 bg-red-700">
+                <div class="section">
+                    <h2>Your Results at a Glance</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">🔗</div>
+                            <div class="metric-value">{{ archetype_score }}%</div>
+                            <div class="metric-label">Archetype Match</div>
+                            <div class="metric-explanation">{{ archetype_match_explanation }}</div>
+                        </div>
+                    </div>
+                </div>
+
+             </div> -->
+            
+
+            <!-- Page 5: Entrepreneurial Stage -->
+            
+
+            <!-- Page 6: Trait Analysis -->
+            <div class="section">
+
+                <div class="section border-2 p-3 bg-white">
+                    <h2 style="font-size: 1.5rem; font-weight: bold;">Entrepreneurial Stage</h2>
+                    <div class="stage-container">
+                        <div class="stage-highlight1 {{ entrepreneurial_stage_class }}">
+                            <h3 style="font-size: 1.2rem; font-weight: bold;" >{{ entrepreneurial_stage }}</h3>
+                            <p style="font-size: 0.9rem; font-weight: bold;">{{ entrepreneurial_stage_description }}</p>
+                        </div>
+                        <div class="stage-definitions">
+                            <div class="stage-definition {{ 'active' if entrepreneurial_stage == 'Build' else '' }}">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Build:</strong> You have a business idea and are ready to bring it to life.
+                            </div>
+                            <div class="stage-definition {{ 'active' if entrepreneurial_stage == 'Explore' else '' }}">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Explore:</strong> You're curious if entrepreneurship fits your story.
+                            </div>
+                            <div class="stage-definition {{ 'active' if entrepreneurial_stage == 'Discover' else '' }}">
+                                <strong style="font-size: 0.9rem; font-weight: bold;">Discover:</strong> You want to understand how entrepreneurial energy shapes your
+                                path.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Trait Insights</h2>
+                <div class="guidance-text">
+                    <p><strong>This radar chart shows your complete trait profile. Each axis represents one of the 18
+                            entrepreneurial traits. The closer to the edge, the stronger that trait. Use this to
+                            identify patterns and understand your overall entrepreneurial profile.</strong></p>
+                </div>
+                <div class="chart-container">
+                   
+                    {{ trait_radar_chart|safe }}
+                </div>
+
+            </div>
+
+            <!-- Page 7: Strengths & Growth Opportunities -->
+            <div class="section">
+                <div class="unified-gauge-section">
+                    <h2 class=" text-[#570F27]">Strengths & Growth Opportunities</h2>
+
+                    <!-- Combined Gauge Section -->
+                    <div class="unified-gauge-tile">
+                        <!-- Strengths Section with Side Text -->
+                        <div class="strengths-section">
+                            
+                            <div class="strengths-layout">
+                                <div class="gauge-header">
+                                    <h3>Your Strengths</h3>
+                                    <div class="guidance-text mb-3">
+                                        <p><strong>These gauges show your strongest traits. Higher scores indicate areas
+                                                where you naturally excel in entrepreneurial contexts.</strong></p>
+                                    </div>
+                                </div>
+                                <div class="strengths-gauges">
+                                    {{ top_trait_gauges|safe }}
+                                </div>
+                                <div class="strengths-text">
+                                    <div class="trait-explanation">
+                                        <p>{{ strengths_explanation }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth Section with Full Space Text -->
+                        <div class="growth-section">
+                            <div class="gauge-header">
+                                <h3>Growth Opportunities</h3>
+                                <div class="guidance-text">
+                                    <p><strong>These gauges highlight areas for development. Focus on these traits to
+                                            strengthen your overall entrepreneurial profile.</strong></p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 gap-6 mb-8">
+                                <div class="w-full">
+                                    {{ growth_trait_gauges|safe }}
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {% for trait_info in growth_trait_explanations %}
+                                    <div class="border-2 border-orange-400 rounded-lg p-6 bg-orange-50">
+                                        <h4 class="text-orange-600 font-bold text-lg mb-3">{{ trait_info.trait_name }}</h4>
+                                        <p class="text-gray-700 text-sm leading-relaxed">{{ trait_info.explanation }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 8: Complete Visualizations -->
+            <div class="section">
+                <h2>Complete Trait Profile Visualization</h2>
+                <div class="guidance-text">
+                    <p><strong>This bar chart provides a comprehensive view of all 18 traits. Red bars indicate growth
+                            opportunities , while green bars show your strengths. Use this to
+                            prioritize your development efforts.</strong></p>
+                </div>
+                <div class="chart-container1">
+                    {{ trait_bar_chart|safe }}
+                </div>
+            </div>
+
+            <!-- Page 9: Archetype Activation Section -->
+
+
+            <div class="section">
+                <div class="archetype-activation-section">
+                    <h2>Nest Steps With Vertria</h2>
+                    <p class="whitespace-pre-line">{{ archetype_activation_description }}</p>
+                </div>
+            </div>
+
+            <!-- Page 11: Community & Next Steps -->
+            <div class="section">
+                <div class="community-next-steps">
+                    <h2>Next Steps with Vertria – {{ entrepreneurial_stage }} Phase</h2>
+                    <div class="growth-opportunities-box">
+                        <p>{{ next_steps_description }}</p>
+                    </div>
+                    <div class="vantage-section">
+                        <div class="vantage-header">
+                            <h3>🎯 Vertria Vantage</h3>
+                            <div class="vantage-subtitle">Your Personalized Pathway to Entrepreneurial Excellence</div>
+                        </div>
+                        <div class="vantage-content">
+                            <p>{{ vantage_description }}</p>
+                            <div class="vantage-cta">
+                                <p><strong>Ready to transform your growth areas into strengths?</strong> Vertria Vantage
+                                    provides the expert guidance and personalized support you need to accelerate your
+                                    entrepreneurial journey.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mentors-section">
+                        <h3>Mentors</h3>
+                        <p>{{ mentors_description }}</p>
+                    </div>
+                    <div class="community-section">
+                        <h3>Community</h3>
+                        <div class="community-items">
+                            {% for item in community_items %}
+                            <div class="community-item">
+                                <strong>{{ item.title }}:</strong> {{ item.description }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reflection Questions -->
+        <div class="section">
+            <div class="reflection-questions">
+                <h2>Reflection Questions</h2>
+                <p class="reflection-intro">These reflection questions are only the beginning of your journey. Now that
+                    you've had time to digest your entrepreneurial report, it's time to start digging deeper. These
+                    reflection questions are designed to help you begin that work. At Vertria, we look forward to
+                    supporting you on the journey.</p>
+                <div class="questions-list">
+                    <div class="question-item">1. What surprised you most about your archetype?</div>
+                    <div class="question-item">2. How do your top traits show up in daily life?</div>
+                    <div class="question-item">3. Which growth area resonates with you most?</div>
+                    <div class="question-item">4. How might entrepreneurship fit into your future story?</div>
+                    <div class="question-item">5. What aspects of your current work align with entrepreneurial thinking?
+                    </div>
+                    <div class="question-item">6. How might you develop your entrepreneurial mindset further?</div>
+                    <div class="question-item">7. Did you notice any conflicts between traits?</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            <p>"The future belongs to those who act boldly."</p>
+            <p>© Vertria | info@vertria.com</p>
+            <p>
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-current font-bold mr-1.5 align-middle">©</span>
+                2025 Vertria. All rights reserved
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
