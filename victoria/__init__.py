@@ -1,6 +1,15 @@
 """
-Victoria Project - Psychometric Assessment Analysis System
+Victoria Package
+Professional psychometric assessment system
 """
 
-__version__ = "1.0.0"
-__author__ = "Victoria Team"
+from .services import AssessmentService
+from .scoring import UnifiedTraitScorer
+from .factories import DependencyFactory
+
+__version__ = "2.0.0"
+__all__ = [
+    'AssessmentService',
+    'UnifiedTraitScorer', 
+    'DependencyFactory'
+]

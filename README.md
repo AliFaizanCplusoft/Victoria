@@ -1,4 +1,4 @@
-# 🎯 Victoria Project - Psychometric Assessment Analysis System
+# 🎯 Vetria Project - Psychometric Assessment Analysis System
 
 A comprehensive system for processing raw survey data through advanced psychometric analysis (RaschPy) and creating interactive dashboards with professional reporting capabilities.
 
@@ -149,7 +149,7 @@ python main.py --file survey_data.csv --output reports/
 ## 🛠️ Project Structure
 
 ```
-Victoria_Project/
+Vetria_Project/
 ├── app/                          # Application entry points
 │   ├── api/                      # FastAPI application
 │   └── streamlit/                # Streamlit UI application
@@ -340,7 +340,7 @@ railway up --service api
 1. Push to GitHub
 2. Go to [railway.app](https://railway.app)
 3. Click "Deploy from GitHub"
-4. Select your Victoria Project repo
+4. Select your Vetria Project repo
 5. Create two services:
    - **Dashboard Service**: `SERVICE_TYPE=dashboard`
    - **API Service**: `SERVICE_TYPE=api`
@@ -390,7 +390,7 @@ gcloud run deploy victoria-api --image gcr.io/PROJECT-ID/victoria --set-env-vars
 
 ## 🎉 Ready to Analyze!
 
-Your Victoria Project system provides:
+Your Vetria Project system provides:
 - **Professional psychometric analysis** with RaschPy integration
 - **Modern web interface** for interactive exploration
 - **Comprehensive reporting** in multiple formats
@@ -401,4 +401,4 @@ Your Victoria Project system provides:
 
 ---
 
-**Victoria Project** - Transforming assessment data into actionable insights through advanced psychometric analysis and interactive visualization.
+**Vetria Project** - Transforming assessment data into actionable insights through advanced psychometric analysis and interactive visualization.

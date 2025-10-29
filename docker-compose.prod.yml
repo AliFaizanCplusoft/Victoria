@@ -1,0 +1,100 @@
+# Vetria Project - Production Docker Compose
+version: '3.8'
+
+services:
+  # FastAPI Server Service - Main API
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: vetria-api-prod
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_NAME=api
+      - PYTHONPATH=/app
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DOCKER_ENV=true
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS:-2000}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+      - ./responses.csv:/app/responses.csv:ro
+      - ./trait.txt:/app/trait.txt:ro
+      - ./templates:/app/templates:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - vetria-network
+
+  # Streamlit Dashboard Service
+  dashboard:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: vetria-dashboard-prod
+    ports:
+      - "8501:8501"
+    environment:
+      - SERVICE_NAME=dashboard
+      - PYTHONPATH=/app
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS:-2000}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+      - ./responses.csv:/app/responses.csv:ro
+      - ./trait.txt:/app/trait.txt:ro
+      - ./templates:/app/templates:ro
+    command: ["python", "main.py", "streamlit"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - vetria-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: vetria-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - dashboard
+    restart: unless-stopped
+    networks:
+      - vetria-network
+
+# Named volumes for persistence
+volumes:
+  vetria_data:
+    driver: local
+
+# Network configuration
+networks:
+  vetria-network:
+    driver: bridge

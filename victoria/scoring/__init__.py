@@ -1,13 +1,8 @@
-"""Psychometric scoring module"""
+"""
+Scoring Package
+Trait scoring implementations
+"""
 
-from .trait_scorer import TraitScorer
+from .unified_trait_scorer import UnifiedTraitScorer, DefaultScoringStrategy
 
-__all__ = ['TraitScorer']
-
-
-
-
-
-
-
-
+__all__ = ['UnifiedTraitScorer', 'DefaultScoringStrategy']

@@ -1,7 +1,7 @@
 #!/bin/bash
-# Victoria Project - Docker Startup Script
+# Vetria Project - Docker Startup Script
 
-echo "Starting Victoria Assessment API..."
+echo "Starting Vetria Assessment API..."
 
 # Create necessary directories
 mkdir -p /app/logs /app/output/reports /app/temp/uploads /app/temp/processing

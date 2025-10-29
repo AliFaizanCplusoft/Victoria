@@ -1,14 +1,13 @@
-# Vetria Project - API-Focused Docker Image
-# Optimized for FastAPI server with psychometric assessment pipeline
+# Victoria Project - Production Docker Image
 FROM python:3.9-slim
 
-LABEL maintainer="Vetria Project"
-LABEL description="Psychometric Assessment Analysis API"
+LABEL maintainer="Victoria Project"
+LABEL description="Production Psychometric Assessment Analysis API"
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required for psychometric libraries
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -23,9 +22,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Note: RaschPy functionality is implemented as a custom processor
-# No external RaschPy library installation needed
-
 # Copy application code
 COPY . .
 
@@ -36,21 +32,25 @@ RUN chmod +x docker-start.sh
 RUN mkdir -p logs output/reports temp/uploads temp/processing
 
 # Set environment variables
-
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Expose API port
-EXPOSE 8000
+# Expose ports
+EXPOSE 8000 8501
 
-# Health check for API
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Default command - run the startup script
+# Default command
 CMD ["./docker-start.sh"]
+
+
+
+

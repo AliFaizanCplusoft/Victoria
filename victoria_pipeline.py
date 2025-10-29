@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Victoria Entrepreneurial Assessment Pipeline
+Vetria Entrepreneurial Assessment Pipeline
 Main pipeline script that orchestrates all modules to generate comprehensive reports
 """
 
@@ -55,13 +55,13 @@ from victoria.scoring.fixed_trait_scorer import FixedTraitScorer
 # Set it in your .env file or export OPENAI_API_KEY=your_key_here
 # This ensures no hardcoded API keys are committed to the repository
 
-class VictoriaPipeline:
+class VetriaPipeline:
     """
-    Main pipeline class that orchestrates the complete Victoria assessment process
+    Main pipeline class that orchestrates the complete Vetria assessment process
     """
     
     def __init__(self):
-        """Initialize the Victoria pipeline with all core components"""
+        """Initialize the Vetria pipeline with all core components"""
         self.data_processor = DataProcessor()
         self.trait_scorer = FixedTraitScorer()
         self.archetype_detector = ArchetypeDetector()
@@ -153,7 +153,7 @@ class VictoriaPipeline:
         """
         try:
             logger.info("=" * 80)
-            logger.info("VICTORIA ENTREPRENEURIAL ASSESSMENT PIPELINE")
+            logger.info("VETRIA ENTREPRENEURIAL ASSESSMENT PIPELINE")
             logger.info("=" * 80)
             
             # Step 1: Load and process raw data
@@ -250,7 +250,7 @@ class VictoriaPipeline:
             # Generate report filename
             person_name = profile_data['person_name'].replace(' ', '_')
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            report_filename = f"victoria_report_{person_name}_{timestamp}.html"
+            report_filename = f"vetria_report_{person_name}_{timestamp}.html"
             report_path = os.path.join(output_dir, report_filename)
             
             # Ensure output directory exists
@@ -289,7 +289,7 @@ def main():
     
     try:
         # Initialize pipeline
-        pipeline = VictoriaPipeline()
+        pipeline = VetriaPipeline()
         
         # Generate report
         report_path = pipeline.generate_report(csv_path, person_index=person_index)

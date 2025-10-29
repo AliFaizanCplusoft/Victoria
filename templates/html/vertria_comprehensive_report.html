@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vertria Entrepreneurial Assessment - {{ person_name }}</title>
+    <title>Vetria Entrepreneurial Assessment - {{ person_name }}</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -12,22 +12,22 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         :root {
-            --vertria-burgundy: #570F27;
-            --vertria-dark-blue: #151A4A;
-            --vertria-yellow: #FFDC58;
-            --vertria-deep-burgundy: #240610;
-            --vertria-light-burgundy: #8B2545;
-            --vertria-accent-blue: #2E4A7A;
-            --vertria-background: #FEFEFE;
-            --vertria-light-gray: #F8F9FA;
-            --vertria-text-dark: #2D3748;
-            --vertria-text-medium: #4A5568;
-            --vertria-text-light: #718096;
-            --vertria-primary: #570F27;
-            --vertria-secondary: #8B2545;
-            --vertria-success: #38A169;
-            --vertria-warning: #D69E2E;
-            --vertria-danger: #E53E3E;
+            --vetria-burgundy: #570F27;
+            --vetria-dark-blue: #151A4A;
+            --vetria-yellow: #FFDC58;
+            --vetria-deep-burgundy: #240610;
+            --vetria-light-burgundy: #8B2545;
+            --vetria-accent-blue: #2E4A7A;
+            --vetria-background: #FEFEFE;
+            --vetria-light-gray: #F8F9FA;
+            --vetria-text-dark: #2D3748;
+            --vetria-text-medium: #4A5568;
+            --vetria-text-light: #718096;
+            --vetria-primary: #570F27;
+            --vetria-secondary: #8B2545;
+            --vetria-success: #38A169;
+            --vetria-warning: #D69E2E;
+            --vetria-danger: #E53E3E;
         }
 
         * {
@@ -39,8 +39,8 @@
         body {
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.5;
-            color: var(--vertria-text-dark);
-            background-color: var(--vertria-background);
+            color: var(--vetria-text-dark);
+            background-color: var(--vetria-background);
             font-size: 13px;
         }
 
@@ -49,7 +49,7 @@
         h3 {
             font-family: 'Playfair Display', Georgia, serif;
             font-weight: 600;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-bottom: 0.75rem;
         }
 
@@ -73,7 +73,7 @@
         }
 
         .report-header {
-            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-deep-burgundy) 100%);
+            background: linear-gradient(135deg, var(--vetria-burgundy) 0%, var(--vetria-deep-burgundy) 100%);
             color: white;
             padding: 2rem 1.5rem;
             text-align: center;
@@ -84,7 +84,7 @@
             font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--vertria-yellow);
+            color: var(--vetria-yellow);
             margin-bottom: 0.5rem;
         }
 
@@ -108,7 +108,7 @@
         .person-name {
             font-size: 1.3rem;
             font-weight: 500;
-            color: var(--vertria-yellow);
+            color: var(--vetria-yellow);
             margin-bottom: 0.5rem;
         }
 
@@ -120,7 +120,7 @@
         .archetype-subheader {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--vertria-yellow);
+            color: var(--vetria-yellow);
             margin-bottom: 1rem;
         }
 
@@ -133,22 +133,22 @@
         }
 
         .executive-summary {
-            background: linear-gradient(135deg, var(--vertria-light-gray) 0%, #F0F2F5 100%);
+            background: linear-gradient(135deg, var(--vetria-light-gray) 0%, #F0F2F5 100%);
             padding: 2rem;
             border-radius: 12px;
-            border-left: 6px solid var(--vertria-primary);
+            border-left: 6px solid var(--vetria-primary);
         }
 
         .interpretation-guide {
             background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
             padding: 2rem;
             border-radius: 12px;
-            border-left: 6px solid var(--vertria-accent-blue);
+            border-left: 6px solid var(--vetria-accent-blue);
             margin-bottom: 2rem;
         }
 
         .interpretation-guide h3 {
-            color: var(--vertria-accent-blue);
+            color: var(--vetria-accent-blue);
             margin-bottom: 1rem;
         }
 
@@ -156,17 +156,17 @@
             background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
             padding: 1.5rem;
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-accent-blue);
+            border-left: 4px solid var(--vetria-accent-blue);
             margin-bottom: 1.5rem;
         }
 
         .personalized-insights h3 {
-            color: var(--vertria-accent-blue);
+            color: var(--vetria-accent-blue);
             margin-bottom: 1rem;
         }
 
         .primary-archetype {
-            background: linear-gradient(135deg, var(--vertria-burgundy) 0%, var(--vertria-light-burgundy) 100%);
+            background: linear-gradient(135deg, var(--vetria-burgundy) 0%, var(--vetria-light-burgundy) 100%);
             color: white;
             padding: 2.5rem;
             border-radius: 15px;
@@ -177,7 +177,7 @@
         .archetype-name {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--vertria-yellow);
+            color: var(--vetria-yellow);
             margin-bottom: 0.5rem;
         }
 
@@ -206,25 +206,25 @@
             padding: 1.2rem;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid var(--vertria-light-gray);
+            border: 1px solid var(--vetria-light-gray);
             box-shadow: 0 2px 8px rgba(46, 74, 122, 0.05);
         }
 
         .metric-icon {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
         }
 
         .metric-value {
             font-size: 1.2rem;
             font-weight: 700;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
         }
 
         .metric-label {
             font-size: 0.9rem;
-            color: var(--vertria-text-medium);
+            color: var(--vetria-text-medium);
             margin-top: 0.5rem;
         }
 
@@ -240,20 +240,20 @@
             align-items: center;
             padding: 0.8rem;
             margin-bottom: 0.8rem;
-            background: var(--vertria-light-gray);
+            background: var(--vetria-light-gray);
             border-radius: 6px;
-            border-left: 3px solid var(--vertria-primary);
+            border-left: 3px solid var(--vetria-primary);
         }
 
         .trait-name {
             flex: 1;
             font-weight: 500;
-            color: var(--vertria-text-dark);
+            color: var(--vetria-text-dark);
         }
 
         .trait-score {
             font-weight: 600;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-right: 1rem;
             min-width: 60px;
         }
@@ -273,15 +273,15 @@
         }
 
         .trait-bar.low {
-            background: linear-gradient(90deg, var(--vertria-danger), #FC8181);
+            background: linear-gradient(90deg, var(--vetria-danger), #FC8181);
         }
 
         .trait-bar.med {
-            background: linear-gradient(90deg, var(--vertria-warning), #F6E05E);
+            background: linear-gradient(90deg, var(--vetria-warning), #F6E05E);
         }
 
         .trait-bar.high {
-            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+            background: linear-gradient(90deg, var(--vetria-success), #68D391);
         }
 
         .chart-container {
@@ -331,14 +331,14 @@
             font-family: 'Playfair Display', serif;
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-bottom: 1rem;
             text-align: center;
         }
 
         .guidance-text {
             background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
             border-radius: 8px;
@@ -348,11 +348,11 @@
 
         .guidance-text p {
             margin: 0;
-            color: var(--vertria-text-dark);
+            color: var(--vetria-text-dark);
         }
 
         .guidance-text strong {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-weight: 600;
         }
 
@@ -378,14 +378,14 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--vertria-success), #68D391);
+            background: linear-gradient(90deg, var(--vetria-success), #68D391);
             transition: width 0.3s ease;
         }
 
         .progress-text {
             font-size: 1.1rem;
             font-weight: 600;
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
         }
 
         .archetype-traits {
@@ -397,7 +397,7 @@
         }
 
         .archetype-traits h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-bottom: 0.5rem;
             font-weight: 600;
         }
@@ -419,11 +419,11 @@
             background: rgba(255, 255, 255, 0.95);
             padding: 0.75rem;
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-yellow);
+            border-left: 4px solid var(--vetria-yellow);
         }
 
         .trait-definition strong {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.1rem;
             display: block;
             margin-bottom: 0.5rem;
@@ -467,7 +467,7 @@
         }
 
         .heatmap-section h4 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.3rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -545,12 +545,12 @@
 
         .stage-highlight.build {
             background: linear-gradient(135deg, #FED7D7 0%, #FEB2B2 100%);
-            border: 2px solid var(--vertria-danger);
+            border: 2px solid var(--vetria-danger);
         }
 
         .stage-highlight.explore {
             background: linear-gradient(135deg, #BEE3F8 0%, #90CDF4 100%);
-            border: 2px solid var(--vertria-accent-blue);
+            border: 2px solid var(--vetria-accent-blue);
         }
 
         .stage-highlight.discover {
@@ -559,7 +559,7 @@
         }
 
         .stage-highlight h4 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
@@ -580,8 +580,8 @@
         }
 
         .stage-definition.active {
-            background: var(--vertria-light-gray);
-            border-left-color: var(--vertria-primary);
+            background: var(--vetria-light-gray);
+            border-left-color: var(--vetria-primary);
         }
 
         .trait-highlights {
@@ -614,7 +614,7 @@
         }
 
         .gauge-section h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-bottom: 1rem;
             text-align: center;
         }
@@ -623,7 +623,7 @@
             background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
             padding: 2rem;
             border-radius: 12px;
-            border-left: 6px solid var(--vertria-yellow);
+            border-left: 6px solid var(--vetria-yellow);
         }
 
         .recommendations-content {
@@ -649,13 +649,13 @@
             background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
             padding: 2rem;
             border-radius: 12px;
-            border-left: 6px solid var(--vertria-accent-blue);
+            border-left: 6px solid var(--vetria-accent-blue);
         }
 
         .reflection-intro {
             font-style: italic;
             margin-bottom: 2rem;
-            color: var(--vertria-text-medium);
+            color: var(--vetria-text-medium);
         }
 
         .questions-list {
@@ -674,19 +674,19 @@
             background: rgba(87, 31, 39, 0.05);
             padding: 1.5rem;
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
             margin: 1.5rem 0;
         }
 
         .archetype-activation-section h2 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.4rem;
             margin-bottom: 1rem;
             font-weight: 600;
         }
 
         .archetype-activation-section p {
-            color: var(--vertria-text-dark);
+            color: var(--vetria-text-dark);
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 1rem;
@@ -700,11 +700,11 @@
             background: linear-gradient(135deg, #FFF9E6 0%, #FFF4CC 100%);
             padding: 2rem;
             border-radius: 12px;
-            border-left: 6px solid var(--vertria-yellow);
+            border-left: 6px solid var(--vetria-yellow);
         }
 
         .growth-opportunities-box {
-            background: var(--vertria-yellow);
+            background: var(--vetria-yellow);
             padding: 1.5rem;
             border-radius: 8px;
             margin: 1rem 0;
@@ -730,7 +730,7 @@
         }
 
         .report-footer {
-            background: var(--vertria-primary);
+            background: var(--vetria-primary);
             color: white;
             text-align: center;
             padding: 2rem;
@@ -746,11 +746,11 @@
             padding: 1.5rem;
             background: rgba(87, 15, 39, 0.05);
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
         }
 
         .correlation-explanation h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             margin-bottom: 1rem;
             font-size: 1.2rem;
         }
@@ -768,7 +768,7 @@
         }
 
         .growth-section h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.4rem;
             margin-bottom: 1rem;
         }
@@ -879,7 +879,7 @@
         }
 
         .archetype-executive-section h2 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 2rem;
             margin-bottom: 1.5rem;
             font-weight: 700;
@@ -890,11 +890,11 @@
             padding: 1.5rem;
             background: rgba(87, 31, 39, 0.05);
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
         }
 
         .executive-summary h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.3rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -927,11 +927,11 @@
             padding: 2rem;
             background: rgb(255, 255, 255);
             border-radius: 12px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
         }
 
         .unified-summary h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.4rem;
             margin-bottom: 1.5rem;
             font-weight: 600;
@@ -958,7 +958,7 @@
         }
 
         .unified-gauge-section h2 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.8rem;
             margin-bottom: 2rem;
             font-weight: 700;
@@ -976,7 +976,7 @@
         }
 
         .gauge-header h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.3rem;
             margin-bottom: 0.5rem;
             font-weight: 600;
@@ -1004,7 +1004,7 @@
             padding: 1rem;
             background: rgba(87, 31, 39, 0.05);
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
         }
 
         .strengths-description p,
@@ -1033,7 +1033,7 @@
             padding: 1rem;
             background: rgba(87, 31, 39, 0.05);
             border-radius: 8px;
-            border-left: 4px solid var(--vertria-primary);
+            border-left: 4px solid var(--vetria-primary);
             text-align: center;
         }
 
@@ -1049,7 +1049,7 @@
         }
 
         .gauge-subsection h3 {
-            color: var(--vertria-primary);
+            color: var(--vetria-primary);
             font-size: 1.2rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -1396,7 +1396,7 @@
 
             <div class="section">
                 <div class="archetype-activation-section">
-                    <h2>Nest Steps With Vertria</h2>
+                    <h2>Next Steps With Vetria</h2>
                     <p class="whitespace-pre-line">{{ archetype_activation_description }}</p>
                 </div>
             </div>
@@ -1404,19 +1404,19 @@
             <!-- Page 11: Community & Next Steps -->
             <div class="section">
                 <div class="community-next-steps">
-                    <h2>Next Steps with Vertria – {{ entrepreneurial_stage }} Phase</h2>
+                    <h2>Next Steps with Vetria – {{ entrepreneurial_stage }} Phase</h2>
                     <div class="growth-opportunities-box">
                         <p>{{ next_steps_description }}</p>
                     </div>
                     <div class="vantage-section">
                         <div class="vantage-header">
-                            <h3>🎯 Vertria Vantage</h3>
+                            <h3>🎯 Vetria Vantage</h3>
                             <div class="vantage-subtitle">Your Personalized Pathway to Entrepreneurial Excellence</div>
                         </div>
                         <div class="vantage-content">
                             <p>{{ vantage_description }}</p>
                             <div class="vantage-cta">
-                                <p><strong>Ready to transform your growth areas into strengths?</strong> Vertria Vantage
+                                <p><strong>Ready to transform your growth areas into strengths?</strong> Vetria Vantage
                                     provides the expert guidance and personalized support you need to accelerate your
                                     entrepreneurial journey.</p>
                             </div>
@@ -1446,7 +1446,7 @@
                 <h2>Reflection Questions</h2>
                 <p class="reflection-intro">These reflection questions are only the beginning of your journey. Now that
                     you've had time to digest your entrepreneurial report, it's time to start digging deeper. These
-                    reflection questions are designed to help you begin that work. At Vertria, we look forward to
+                    reflection questions are designed to help you begin that work. At Vetria, we look forward to
                     supporting you on the journey.</p>
                 <div class="questions-list">
                     <div class="question-item">1. What surprised you most about your archetype?</div>
@@ -1464,10 +1464,10 @@
         <!-- Footer -->
         <div class="report-footer">
             <p>"The future belongs to those who act boldly."</p>
-            <p>© Vertria | info@vertria.com</p>
+            <p>© Vetria | info@vetria.com</p>
             <p>
                 <span class="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-current font-bold mr-1.5 align-middle">©</span>
-                2025 Vertria. All rights reserved
+                2025 Vetria. All rights reserved
             </p>
         </div>
     </div>
