@@ -85,12 +85,12 @@ class VisualizationEngine:
             # Mapping from heatmap trait names to archetype trait names (for key trait detection)
             heatmap_to_archetype_mapping = {
                 'Social Orientation': 'Social Orientation',
-                'Resilience and Grit': 'Resilience and Grit',
+                'Resilience & Grit': 'Resilience and Grit',  # Map & to and
                 'Servant Leadership': 'Servant Leadership',
                 'Emotional Intelligence': 'Emotional Intelligence',
-                'Decision-Making': 'Decision Making',
-                'Problem-Solving': 'Problem Solving',
-                'Drive and Ambition': 'Drive and Ambition',
+                'Decision-Making': 'Decision Making',  # Map hyphen to space
+                'Problem-Solving': 'Problem Solving',  # Map hyphen to space
+                'Drive & Ambition': 'Drive and Ambition',  # Map & to and
                 'Innovation Orientation': 'Innovation Orientation',
                 'Adaptability': 'Adaptability',
                 'Critical Thinking': 'Critical Thinking',
@@ -166,7 +166,7 @@ class VisualizationEngine:
                 y=archetypes,  # Use archetypes with line breaks for y-axis
                 text=text_matrix,
                 texttemplate="%{text}",
-                textfont={"color": "black", "size": 7, "family": "Arial, sans-serif", "weight": "bold"},  # Smaller text to fit more content
+                textfont={"color": "black", "size": 11, "family": "Arial, sans-serif", "weight": "bold"},  # Larger text for better readability
                 hovertext=text_matrix,
                 hoverinfo="text",
                 colorscale=[
@@ -185,9 +185,9 @@ class VisualizationEngine:
                     tickfont=dict(size=7)  # Smaller tick font
                 ),
                 hovertemplate="<b>%{y}</b><br>%{x}<br>Trait Score: %{z:.2f}<br><extra></extra>",
-                # Add cell borders with minimal gap
-                xgap=0.3,  # Smaller gap between columns for more compact cells
-                ygap=0.3   # Smaller gap between rows for more compact cells
+                # Add visible cell borders
+                xgap=0.5,  # Gap between columns for visible borders
+                ygap=0.5   # Gap between rows for visible borders
             )
             
             fig = go.Figure(data=heatmap_data)
@@ -201,7 +201,7 @@ class VisualizationEngine:
                             x=j, y=i,
                             text=text_matrix[i][j],
                             showarrow=False,
-                            font=dict(color="black", size=7, family="Arial, sans-serif", weight="bold"),  # Smaller annotation text to fit
+                            font=dict(color="black", size=11, family="Arial, sans-serif", weight="bold"),  # Larger annotation text for readability
                             xref="x", yref="y"
                         )
                     )
@@ -264,16 +264,16 @@ class VisualizationEngine:
                 title=dict(
                     text=f"Trait Scores by Archetype<br><sub style='font-size: 9px; line-height: 1.3;'>Detected: {detected_archetype} (Dark Border) | ★ = Key Traits for Each Archetype</sub>",
                     font=dict(size=13, color="#2c3e50", family="Arial, sans-serif"),  # Smaller title
-                    x=0.5,  # Center horizontally
+                    x=0.4,  # Centered but slightly left (40% from left)
                     xanchor='center',  # Center anchor
                     y=1.0,  # Position at absolute top
                     yref='paper',  # Reference to paper coordinates
-                    pad=dict(t=0, b=70)  # Reduced bottom padding for more compact layout
+                    pad=dict(t=0, b=20)  # Minimal bottom padding to reduce gap
                 ),
                 xaxis=dict(
                     title="Personality Traits", 
-                    tickfont=dict(size=6, weight='bold', family="Arial, sans-serif"),  # Smaller font to fit 17 traits
-                    title_font=dict(size=10, weight='bold', family="Arial, sans-serif"),  # Smaller title font
+                    tickfont=dict(size=8, weight='bold', family="Arial, sans-serif"),  # Bold x-axis labels
+                    title_font=dict(size=10, weight='bold', family="Arial, sans-serif"),  # Bold title font
                     tickangle=-60,  # Steeper angle for more compact labels
                     tickmode='linear',
                     dtick=1,  # Show all ticks
@@ -288,8 +288,8 @@ class VisualizationEngine:
                 ),
                 yaxis=dict(
                     title="Entrepreneurial Archetypes", 
-                    tickfont=dict(size=8, weight='bold'),  # Smaller font for compactness
-                    title_font=dict(size=10, weight='bold'),  # Smaller title font
+                    tickfont=dict(size=9, weight='bold', family="Arial, sans-serif"),  # Bold y-axis labels
+                    title_font=dict(size=10, weight='bold', family="Arial, sans-serif"),  # Bold title font
                     showgrid=False,  # Remove grid lines (we have cell borders)
                     zeroline=False,
                     domain=[0.0, 0.85],  # Start y-axis lower (0.85) to leave more space for title and subtitle above
@@ -298,9 +298,9 @@ class VisualizationEngine:
                     ticktext=archetypes  # Use archetypes with line breaks
                 ),
                 font=dict(family="Arial, sans-serif"),
-                margin=dict(l=40, r=70, t=170, b=100),  # Compact margins
-                height=500, width=1110,  # Balanced width - fits well and readable
-                paper_bgcolor="#FEFEFE", plot_bgcolor="#E5E5E5",  # Slightly darker background to show borders
+                margin=dict(l=40, r=70, t=60, b=100),  # Reduced top margin to minimize gap
+                height=480, width=1100,  # Further reduced height to make cells smaller
+                paper_bgcolor="#FEFEFE", plot_bgcolor="#D0D0D0",  # Darker background to make borders more visible
                 autosize=True,  # Enable autosize for responsive behavior
                 annotations=annotations,
                 # Reduce spacing to make cells more compact
@@ -363,10 +363,11 @@ class VisualizationEngine:
                     dict(
                         text="*Higher social orientation is extroversion, lower social orientation is introversion",
                         xref="paper", yref="paper",
-                        x=0.5, y=-0.15,
+                        x=0.05, y=-0.15,
                         showarrow=False,
                         font=dict(size=10, color="#666666"),
-                        align="center"
+                        align="left",
+                        xanchor="left"
                     )
                 ]
             )

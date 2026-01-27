@@ -137,6 +137,15 @@
             position: relative;
         }
 
+        .report-content1 {
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+            padding-bottom: 2.5rem;
+            padding-top: 0;
+            overflow-x: hidden;  /* Prevent content-level horizontal scroll */
+            position: relative;
+        }
+
         .section {
             overflow-x: hidden;  /* Prevent section-level horizontal scroll */
             margin-bottom: 2rem;
@@ -489,7 +498,8 @@
             position: relative;
             display: flex;
             justify-content: center;  /* Center horizontally */
-            align-items: center;  /* Center vertically */
+            align-items: flex-start;  /* Align to top */
+            margin-top: 0;  /* No top margin to reduce gap */
         }
         
         /* Make Plotly chart centered and fit container */
@@ -770,7 +780,7 @@
 
         .reflection-questions {
             background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-            padding: 2rem;
+            
             border-radius: 12px;
             border-left: 6px solid var(--vetria-accent-blue);
         }
@@ -1216,7 +1226,9 @@
             .report-content {
                 padding: 0px;
             }
-
+            .report-content1 {
+                padding: 0px;
+            }
             .stage-container {
                 grid-template-columns: 1fr;
             }
@@ -1376,10 +1388,10 @@
                                     entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
                                     was selected for you.</strong></p>
                         </div> -->
-                        <p style="margin-bottom: 1rem;"><strong>This heatmap shows how your personality traits correlate with different
+                        <p style="margin-bottom: 0; margin-top: 0; padding-bottom: 0.25rem;"><strong>This heatmap shows how your personality traits correlate with different
                             entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
                             was selected for you.</strong></p>
-                        <div class="heatmap-wrapper" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                        <div class="heatmap-wrapper" style="width: 100%; margin-top: 0; padding-top: 0;">
                             <div style="margin: 0 auto; display: block;">
                                 {{ archetype_heatmap|safe }}
                             </div>
@@ -1439,7 +1451,7 @@
                             entrepreneurial traits. The closer to the edge, the stronger that trait. Use this to
                             identify patterns and understand your overall entrepreneurial profile.</strong></p>
                 </div>
-                <div class="chart-container">
+                <div class="chart-container" style="min-height: 580px !important;">
                    
                     {{ trait_radar_chart|safe }}
                 </div>
@@ -1567,7 +1579,8 @@
 
         <!-- Reflection Questions -->
         <div class="section">
-            <div class="reflection-questions">
+            <div class="report-content1 bg-[#F8F8F9]">
+                <div class="reflection-questions p-4">
                 <h2>Reflection Questions</h2>
                 <p class="reflection-intro">These reflection questions are only the beginning of your journey. Now that
                     you've had time to digest your entrepreneurial report, it's time to start digging deeper. These
@@ -1584,6 +1597,8 @@
                     <div class="question-item">7. Did you notice any conflicts between traits?</div>
                 </div>
             </div>
+        </div>
+            
         </div>
 
         <!-- Footer -->
