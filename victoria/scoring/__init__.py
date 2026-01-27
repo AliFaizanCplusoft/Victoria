@@ -3,6 +3,6 @@ Scoring Package
 Trait scoring implementations
 """
 
-from .unified_trait_scorer import UnifiedTraitScorer, DefaultScoringStrategy
+from .fixed_trait_scorer import FixedTraitScorer
 
-__all__ = ['UnifiedTraitScorer', 'DefaultScoringStrategy']
+__all__ = ['FixedTraitScorer']

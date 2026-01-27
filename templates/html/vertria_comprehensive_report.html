@@ -42,6 +42,11 @@
             color: var(--vetria-text-dark);
             background-color: var(--vetria-background);
             font-size: 13px;
+            overflow-x: hidden;  /* Prevent page-level horizontal scroll - heatmap handles its own scrolling */
+        }
+        
+        html {
+            overflow-x: hidden;  /* Prevent page-level horizontal scroll - heatmap handles its own scrolling */
         }
 
         h1,
@@ -69,7 +74,9 @@
             max-width: 1000px;
             margin: 0 auto;
             background: white;
-            overflow: hidden;
+            overflow-x: hidden;  /* Prevent page-level horizontal scroll */
+            overflow-y: auto;
+            position: relative;  /* For absolute positioning if needed */
         }
 
         .report-header {
@@ -126,9 +133,12 @@
 
         .report-content {
             padding: 2.5rem;
+            overflow-x: hidden;  /* Prevent content-level horizontal scroll */
+            position: relative;
         }
 
         .section {
+            overflow-x: hidden;  /* Prevent section-level horizontal scroll */
             margin-bottom: 2rem;
         }
 
@@ -461,10 +471,123 @@
 
         .heatmap-section {
             margin-top: 2rem;
-           
+            padding: 1rem;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;  /* Prevent any overflow */
+            width: 100%;  /* Fit within parent */
+            max-width: 100%;  /* Never exceed parent width */
+            position: relative;
+            background: white;  /* Match report background */
         }
+        
+        /* Heatmap wrapper - contains heatmap within parent, centered */
+        .heatmap-section .heatmap-wrapper {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;  /* Hide any overflow - no scrollbars */
+            position: relative;
+            display: flex;
+            justify-content: center;  /* Center horizontally */
+            align-items: center;  /* Center vertically */
+        }
+        
+        /* Make Plotly chart centered and fit container */
+        .heatmap-section .plotly-graph-div {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 450px;
+            display: block;
+            margin: 0 auto;  /* Center the chart */
+        }
+        
+        /* Center the Plotly container div */
+        .heatmap-section .heatmap-wrapper > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto;  /* Center horizontally */
+            display: block;
+        }
+        
+        /* Ensure Plotly SVG is centered */
+        .heatmap-section .plotly-graph-div svg {
+            margin: 0 auto;
+            display: block;
+        }
+        
+        /* Force Plotly SVG to scale to container */
+        .heatmap-section .plotly-graph-div svg {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+        }
+        
+        /* Ensure Plotly container divs respect width */
+        .heatmap-section .plotly-graph-div > div {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* Scale down the entire heatmap if needed to fit */
+        .heatmap-section .heatmap-wrapper > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: hidden;
+        }
+        
+        /* For PDF generation - ensure proper scaling */
+        @media print {
+            .heatmap-section {
+                width: 100%;
+                overflow: visible;
+                page-break-inside: avoid;
+            }
+            
+            .heatmap-section .heatmap-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .heatmap-section .plotly-graph-div {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .heatmap-section .plotly-graph-div svg {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+        
+        /* For PDF generation - ensure heatmap scales down properly */
+        @media print {
+            .heatmap-section {
+                page-break-inside: avoid;
+                overflow: visible;
+                width: 100%;
+            }
+            
+            .heatmap-section .heatmap-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .heatmap-section .plotly-graph-div {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .heatmap-section .heatmap-wrapper svg {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+        
+        /* Heatmap section handles its own scrolling */
+        /* No need to override report-container overflow */
 
         .heatmap-section h4 {
             color: var(--vetria-primary);
@@ -1236,7 +1359,7 @@
                     <div class="archetype-traits">
                         <h1 style="font-size: 1.1rem; font-weight: bold;" >Key Traits for {{ archetype_name }}:</h1>
                         <div class="grid grid-cols-2 gap-4 mt-4">
-                            {% for trait in traits[:4] %}
+                            {% for trait in key_traits %}
                             <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm border-l-8 border-l-red-800">
                                 <strong class="text-red-800 text-lg block mb-2">{{ trait.name }}</strong>
                                 <p class="text-gray-600 text-[0.95rem] leading-relaxed">{{ trait.description }}</p>
@@ -1253,11 +1376,13 @@
                                     entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
                                     was selected for you.</strong></p>
                         </div> -->
-                        <div class="">
-                            <p><strong>This heatmap shows how your personality traits correlate with different
-                                entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
-                                was selected for you.</strong></p>
-                            {{ archetype_heatmap|safe }}
+                        <p style="margin-bottom: 1rem;"><strong>This heatmap shows how your personality traits correlate with different
+                            entrepreneurial archetypes, helping explain why the {{ archetype_name }} archetype
+                            was selected for you.</strong></p>
+                        <div class="heatmap-wrapper" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                            <div style="margin: 0 auto; display: block;">
+                                {{ archetype_heatmap|safe }}
+                            </div>
                         </div>
                     </div>
                 </div>

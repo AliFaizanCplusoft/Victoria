@@ -31,7 +31,7 @@ class ReportGenerator:
         self.trait_name_mapping = {
             'A': 'Accountability', 'AD': 'Adaptability', 'C': 'Conflict Resolution',
             'CT': 'Critical Thinking', 'DA': 'Drive and Ambition', 'DM': 'Decision-Making',
-            'EI': 'Emotional Intelligence', 'F': 'Approach to Failure', 'IN': 'Introversion and Extroversion',
+            'EI': 'Emotional Intelligence', 'F': 'Approach to Failure', 'IN': 'Social Orientation',
             'IO': 'Innovation Orientation', 'N': 'Negotiation', 'PS': 'Problem-Solving',
             'RB': 'Relationship-Building', 'RG': 'Resilience and Grit', 'RT': 'Risk-Taking',
             'SL': 'Servant Leadership', 'TB': 'Team Building'
@@ -206,12 +206,19 @@ Provide actionable, specific recommendations that align with their goals and cur
                     trait_code = self._get_trait_code_from_name(trait_name)
                     
                     # Extract strength and growth area descriptions
+                    # Special handling for IN trait which has two "as a Strength" sections
                     strength_text = ""
                     growth_text = ""
+                    extroversion_text = ""
+                    introversion_text = ""
                     
                     current_section = ""
                     for line in lines[1:]:
-                        if "as a Strength" in line:
+                        if "Extroversion as a Strength" in line:
+                            current_section = "extroversion"
+                        elif "Introversion as a Strength" in line:
+                            current_section = "introversion"
+                        elif "as a Strength" in line and trait_code != 'IN':
                             current_section = "strength"
                         elif "as a Growth Area" in line:
                             current_section = "growth"
@@ -220,12 +227,24 @@ Provide actionable, specific recommendations that align with their goals and cur
                                 strength_text += line.strip() + " "
                             elif current_section == "growth":
                                 growth_text += line.strip() + " "
+                            elif current_section == "extroversion":
+                                extroversion_text += line.strip() + " "
+                            elif current_section == "introversion":
+                                introversion_text += line.strip() + " "
                     
                     if trait_code:
-                        trait_descriptions[trait_code] = {
-                            'high': strength_text.strip(),
-                            'low': growth_text.strip()
-                        }
+                        # Special handling for IN trait (Social Orientation)
+                        if trait_code == 'IN':
+                            trait_descriptions[trait_code] = {
+                                'high_extro': extroversion_text.strip(),
+                                'high_intro': introversion_text.strip(),
+                                'low': growth_text.strip()
+                            }
+                        else:
+                            trait_descriptions[trait_code] = {
+                                'high': strength_text.strip(),
+                                'low': growth_text.strip()
+                            }
             
             return trait_descriptions
         except Exception as e:
@@ -236,7 +255,8 @@ Provide actionable, specific recommendations that align with their goals and cur
         """Map trait name to trait code"""
         name_to_code = {
             'Risk-Taking': 'RT',
-            'Introversion and Extroversion': 'IN',
+            'Introversion and Extroversion': 'IN',  # Keep for backward compatibility with trait.txt
+            'Social Orientation': 'IN',  # New name
             'Relationship-Building': 'RB',
             'Decision-Making': 'DM',
             'Problem-Solving': 'PS',
@@ -427,8 +447,10 @@ Provide actionable, specific recommendations that align with their goals and cur
     def _generate_strengths_explanation(self, trait_scores: Dict[str, float]) -> str:
         """Generate explanation for top 3 strengths shown in gauge graphs"""
         try:
-            # Get top 3 traits (same as gauge graphs)
-            sorted_traits = sorted(trait_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+            # Filter out IN (Social Orientation) from trait scores
+            filtered_scores = {k: v for k, v in trait_scores.items() if k != 'IN'}
+            # Get top 3 traits (same as gauge graphs, excluding IN)
+            sorted_traits = sorted(filtered_scores.items(), key=lambda x: x[1], reverse=True)[:3]
             
             if not sorted_traits:
                 return "Your entrepreneurial strengths are developing through continuous learning and experience."
@@ -474,10 +496,12 @@ Write a brief 2-3 line explanation that highlights how these specific traits wor
     def _generate_growth_explanation(self, trait_scores: Dict[str, float]) -> str:
         """Generate explanation for growth opportunities shown in gauge graphs"""
         try:
+            # Filter out IN (Social Orientation) from trait scores
+            filtered_scores = {k: v for k, v in trait_scores.items() if k != 'IN'}
             # Get bottom 3 traits (same as growth gauge graphs) - exclude top 3 to avoid duplication
-            sorted_traits = sorted(trait_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
+            sorted_traits = sorted(filtered_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
             # Get the actual bottom 3 traits with lowest scores, but exclude any that are in top 3
-            top_3_traits = sorted(trait_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+            top_3_traits = sorted(filtered_scores.items(), key=lambda x: x[1], reverse=True)[:3]
             top_3_codes = [trait[0] for trait in top_3_traits]
             
             # Get the bottom 3 traits from the lowest scores, excluding top 3
@@ -536,8 +560,10 @@ Write a brief 2-3 line explanation that motivates development in these specific 
     def _generate_individual_growth_explanations(self, trait_scores: Dict[str, float]) -> List[Dict[str, str]]:
         """Generate individual explanations for each growth trait"""
         try:
+            # Filter out IN (Social Orientation) from trait scores
+            filtered_scores = {k: v for k, v in trait_scores.items() if k != 'IN'}
             # Get bottom 3 traits (lowest scores) - simple approach
-            sorted_traits = sorted(trait_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
+            sorted_traits = sorted(filtered_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
             bottom_traits = sorted_traits[:3]  # Take the first 3 (lowest scores)
             
             # Debug: Print the bottom 3 traits being selected
@@ -605,19 +631,44 @@ Write a brief 2-3 line explanation that motivates development in these specific 
         if not hasattr(self, '_trait_descriptions'):
             self._trait_descriptions = self._load_trait_descriptions()
         
-        # Always use the 'high' (Strength) description from trait.txt, regardless of score
-        # This ensures we get the actual trait descriptions, not the growth area messages
+        # Special handling for IN trait (Social Orientation)
+        if trait_code == 'IN':
+            if trait_code in self._trait_descriptions:
+                # Select description based on score threshold (0.5)
+                if score >= 0.5:
+                    # High score = Extroversion
+                    full_description = self._trait_descriptions[trait_code].get('high_extro', '')
+                else:
+                    # Low score = Introversion
+                    full_description = self._trait_descriptions[trait_code].get('high_intro', '')
+                
+                if full_description.strip():
+                    # Only vary the first sentence using LLM, keep rest from trait.txt
+                    if self.openai_client:
+                        return self._vary_first_sentence_only(trait_code, score, full_description)
+                    else:
+                        return full_description
+                else:
+                    # Fallback if descriptions not found
+                    return f"Your {self.trait_name_mapping.get(trait_code, trait_code)} score is {round(score * 100, 1)}%."
+            else:
+                return f"Your {self.trait_name_mapping.get(trait_code, trait_code)} score is {round(score * 100, 1)}%."
+        
+        # For all other traits, use the standard 'high' (Strength) description
         level = 'high'
         
         # Get description for trait code
         if trait_code in self._trait_descriptions:
-            full_description = self._trait_descriptions[trait_code][level]
+            full_description = self._trait_descriptions[trait_code].get(level, '')
             
             # Only vary the first sentence using LLM, keep rest from trait.txt
-            if self.openai_client and full_description.strip():
-                return self._vary_first_sentence_only(trait_code, score, full_description)
+            if full_description.strip():
+                if self.openai_client:
+                    return self._vary_first_sentence_only(trait_code, score, full_description)
+                else:
+                    return full_description
             else:
-                return full_description
+                return f"Your {self.trait_name_mapping.get(trait_code, trait_code)} score is {round(score * 100, 1)}%."
         else:
             # Fallback to basic description
             return f"Your {self.trait_name_mapping.get(trait_code, trait_code)} score is {round(score * 100, 1)}%."
@@ -753,6 +804,90 @@ Don't stop at insight. Step into Vertria Vantage, the next stage of your journey
             
             # Sort traits by score (highest first)
             traits.sort(key=lambda x: x['score'], reverse=True)
+            
+            # Create prioritized Key Traits list: Social Orientation FIRST, then archetype key traits
+            from victoria.core.archetype_detector import ArchetypeDetector
+            detector = ArchetypeDetector()
+            archetype_name = data.get('archetype_name', 'Resilient Leadership')
+            
+            # Find the archetype object
+            archetype_obj = None
+            for arch_id, arch in detector.archetypes.items():
+                if arch.name == archetype_name:
+                    archetype_obj = arch
+                    break
+            
+            # Create prioritized traits list for Key Traits section
+            key_traits_for_section = []
+            
+            # STEP 1: ALWAYS add Social Orientation FIRST (trait code 'IN')
+            if 'IN' in trait_scores:
+                social_orientation_score = trait_scores['IN']
+                social_orientation_name = self.trait_name_mapping.get('IN', 'Social Orientation')
+                social_orientation_description = self._get_trait_description('IN', social_orientation_score)
+                key_traits_for_section.append({
+                    'code': social_orientation_name,
+                    'name': social_orientation_name,
+                    'score': social_orientation_score,
+                    'percentage': round(social_orientation_score * 100, 1),
+                    'description': social_orientation_description,
+                    'is_low_score': social_orientation_score < 0.6,
+                    'css_class': 'low-score' if social_orientation_score < 0.6 else '',
+                    'is_key_trait': False,  # Not technically a key trait, but always shown
+                    'is_social_orientation': True  # Flag to identify this special trait
+                })
+            
+            # STEP 2: Add archetype key traits (up to 3 more, for total of 4)
+            if archetype_obj:
+                # Map archetype key trait names to trait codes
+                key_trait_codes = []
+                for key_trait_name in archetype_obj.key_traits:
+                    trait_code = detector.trait_name_to_code.get(key_trait_name)
+                    if trait_code and trait_code != 'IN':  # Exclude IN since we already added it
+                        key_trait_codes.append(trait_code)
+                
+                # Get trait data for key traits, sorted by score (highest first)
+                archetype_key_traits_data = []
+                for trait_code in key_trait_codes:
+                    if trait_code in trait_scores:
+                        trait_name = self.trait_name_mapping.get(trait_code, trait_code)
+                        score = trait_scores[trait_code]
+                        trait_description = self._get_trait_description(trait_code, score)
+                        archetype_key_traits_data.append({
+                            'code': trait_name,
+                            'name': trait_name,
+                            'score': score,
+                            'percentage': round(score * 100, 1),
+                            'description': trait_description,
+                            'is_low_score': score < 0.6,
+                            'css_class': 'low-score' if score < 0.6 else '',
+                            'is_key_trait': True
+                        })
+                
+                # Sort archetype key traits by score (highest first) and take top 3
+                archetype_key_traits_data.sort(key=lambda x: x['score'], reverse=True)
+                key_traits_for_section.extend(archetype_key_traits_data[:3])
+                
+                # If we have fewer than 4 total traits (including Social Orientation), 
+                # fill remaining slots with highest-scoring non-key traits
+                if len(key_traits_for_section) < 4:
+                    remaining_slots = 4 - len(key_traits_for_section)
+                    existing_codes = [t['code'] for t in key_traits_for_section]
+                    non_key_traits = [t for t in traits if t['code'] not in existing_codes]
+                    key_traits_for_section.extend(non_key_traits[:remaining_slots])
+                
+                data['key_traits'] = key_traits_for_section[:4]  # Ensure max 4 traits
+            else:
+                # Fallback: Social Orientation + top 3 by score if archetype not found
+                if 'IN' in trait_scores:
+                    # Social Orientation already added above, get remaining traits
+                    social_orientation_name = self.trait_name_mapping.get('IN', 'Social Orientation')
+                    remaining_traits = [t for t in traits if t['code'] != social_orientation_name]
+                    key_traits_for_section.extend(remaining_traits[:3])
+                else:
+                    # If IN not found, just use top 4 by score
+                    key_traits_for_section = traits[:4]
+                data['key_traits'] = key_traits_for_section[:4]
             
             # Add traits data to template data
             data['traits'] = traits

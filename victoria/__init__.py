@@ -3,13 +3,17 @@ Victoria Package
 Professional psychometric assessment system
 """
 
-from .services import AssessmentService
-from .scoring import UnifiedTraitScorer
-from .factories import DependencyFactory
+# Core modules
+from .core import DataProcessor, ArchetypeDetector, VisualizationEngine, ReportGenerator
+
+# Scoring modules
+from .scoring.fixed_trait_scorer import FixedTraitScorer
 
 __version__ = "2.0.0"
 __all__ = [
-    'AssessmentService',
-    'UnifiedTraitScorer', 
-    'DependencyFactory'
+    'DataProcessor',
+    'ArchetypeDetector',
+    'VisualizationEngine',
+    'ReportGenerator',
+    'FixedTraitScorer'
 ]

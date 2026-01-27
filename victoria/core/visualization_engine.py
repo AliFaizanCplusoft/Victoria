@@ -39,7 +39,7 @@ class VisualizationEngine:
         ]
         
         self.trait_descriptions = {
-            'IN': 'Introversion and Extroversion',
+            'IN': 'Social Orientation*',
             'DM': 'Decision-Making',
             'RB': 'Relationship-Building',
             'N': 'Negotiation',
@@ -62,31 +62,87 @@ class VisualizationEngine:
         """Create archetype-trait heatmap showing correlation scores"""
         try:
             # Define trait names in exact order (matching the heatmap)
+            # Use shorter names for x-axis to prevent truncation
             trait_names = [
+                'Social Orientation',  # IN - Always include first
                 'Resilience & Grit', 'Servant Leadership', 'Emotional Intelligence',
-                'Decision Making', 'Problem Solving', 'Drive & Ambition',
-                'Innovation & Orientation', 'Adaptability', 'Critical Thinking',
-                'Team Building', 'Risk Taking', 'Accountability'
+                'Decision-Making', 'Problem-Solving', 'Drive & Ambition',
+                'Innovation Orientation', 'Adaptability', 'Critical Thinking',
+                'Team Building', 'Risk Taking', 'Accountability',
+                'Relationship-Building', 'Negotiation', 'Conflict Resolution', 'Approach to Failure'
             ]
             
-            # Define archetypes in exact order
-            archetypes = [
-                'Adaptive Intelligence', 'Ambitious Drive', 'Collaborative Responsibility', 
-                'Resilient Leadership', 'Strategic Innovation'
+            # Shorter display names for x-axis labels to prevent truncation
+            trait_display_names = [
+                'Social Orientation',
+                'Resilience & Grit', 'Servant Leadership', 'Emotional Intel.',
+                'Decision-Making', 'Problem-Solving', 'Drive & Ambition',
+                'Innovation Orient.', 'Adaptability', 'Critical Thinking',
+                'Team Building', 'Risk Taking', 'Accountability',
+                'Relationship-Bldg', 'Negotiation', 'Conflict Resol.', 'Approach to Failure'
             ]
             
-            # Get archetype correlation data
+            # Mapping from heatmap trait names to archetype trait names (for key trait detection)
+            heatmap_to_archetype_mapping = {
+                'Social Orientation': 'Social Orientation',
+                'Resilience and Grit': 'Resilience and Grit',
+                'Servant Leadership': 'Servant Leadership',
+                'Emotional Intelligence': 'Emotional Intelligence',
+                'Decision-Making': 'Decision Making',
+                'Problem-Solving': 'Problem Solving',
+                'Drive and Ambition': 'Drive and Ambition',
+                'Innovation Orientation': 'Innovation Orientation',
+                'Adaptability': 'Adaptability',
+                'Critical Thinking': 'Critical Thinking',
+                'Team Building': 'Team Building',
+                'Risk Taking': 'Risk Taking',
+                'Accountability': 'Accountability',
+                'Relationship-Building': 'Relationship-Building',
+                'Negotiation': 'Negotiation',
+                'Conflict Resolution': 'Conflict Resolution',
+                'Approach to Failure': 'Approach to Failure'
+            }
+            
+            # Get archetype correlation data first
             from victoria.core.archetype_detector import ArchetypeDetector
             detector = ArchetypeDetector()
             correlation_data = detector.get_archetype_correlation_data()
+            
+            # Get key traits for each archetype for highlighting
+            archetype_key_traits = {}
+            for archetype_id, archetype_obj in detector.archetypes.items():
+                archetype_name = archetype_obj.name
+                archetype_key_traits[archetype_name] = archetype_obj.key_traits
+            
+            # Define archetypes in exact order with line breaks for long names (for y-axis display)
+            archetypes = [
+                'Adaptive<br>Intelligence', 'Ambitious Drive', 'Collaborative<br>Responsibility', 
+                'Resilient<br>Leadership', 'Strategic<br>Innovation'
+            ]
+            
+            # Map display names (with line breaks) to full names for correlation data and key trait matching
+            archetype_display_to_full = {
+                'Adaptive<br>Intelligence': 'Adaptive Intelligence',
+                'Ambitious Drive': 'Ambitious Drive',
+                'Collaborative<br>Responsibility': 'Collaborative Responsibility',
+                'Resilient<br>Leadership': 'Resilient Leadership',
+                'Strategic<br>Innovation': 'Strategic Innovation'
+            }
             
             # Create trait score matrix and text matrix
             trait_score_matrix = []
             text_matrix = []
             
-            for archetype in archetypes:
-                # Get correlation scores for this archetype
-                correlation_scores = correlation_data.get(archetype, [0.0] * len(trait_names))
+            for archetype_display in archetypes:
+                # Map display name (with line breaks) to full name for correlation data lookup
+                archetype_full = archetype_display_to_full.get(archetype_display, archetype_display)
+                # Get correlation scores for this archetype (should have 17 values)
+                correlation_scores = correlation_data.get(archetype_full, [0.0] * 17)
+                # Ensure we have exactly 17 values
+                if len(correlation_scores) < 17:
+                    # Pad with zeros if needed
+                    correlation_scores.extend([0.0] * (17 - len(correlation_scores)))
+                
                 score_row = []
                 text_row = []
                 
@@ -103,14 +159,14 @@ class VisualizationEngine:
             logger.info(f"Trait names: {trait_names}")
             logger.info(f"Archetypes: {archetypes}")
             
-            # Create heatmap
+            # Create compact heatmap with smaller cells and borders
             heatmap_data = go.Heatmap(
                 z=trait_score_matrix,
-                x=trait_names,
-                y=archetypes,
+                x=trait_display_names,  # Use shorter display names for x-axis
+                y=archetypes,  # Use archetypes with line breaks for y-axis
                 text=text_matrix,
                 texttemplate="%{text}",
-                textfont={"color": "black", "size": 12, "family": "Arial, sans-serif", "weight": "bold"},
+                textfont={"color": "black", "size": 7, "family": "Arial, sans-serif", "weight": "bold"},  # Smaller text to fit more content
                 hovertext=text_matrix,
                 hoverinfo="text",
                 colorscale=[
@@ -121,13 +177,17 @@ class VisualizationEngine:
                 zmax=1,
                 showscale=True,
                 colorbar=dict(
-                    title="Trait<br>Score",
+                    title=dict(text="Trait<br>Score", font=dict(size=9)),  # Fixed: use title dict with font
                     tickmode="array",
                     tickvals=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
                     ticktext=["Low", "Low-Med", "Medium", "High", "Very High", "Perfect"],
-                    len=0.8, thickness=25, x=1.02, xpad=10
+                    len=0.6, thickness=15, x=0.78, xpad=3,  # Smaller, closer colorbar
+                    tickfont=dict(size=7)  # Smaller tick font
                 ),
-                hovertemplate="<b>%{y}</b><br>%{x}<br>Trait Score: %{z:.2f}<br><extra></extra>"
+                hovertemplate="<b>%{y}</b><br>%{x}<br>Trait Score: %{z:.2f}<br><extra></extra>",
+                # Add cell borders with minimal gap
+                xgap=0.3,  # Smaller gap between columns for more compact cells
+                ygap=0.3   # Smaller gap between rows for more compact cells
             )
             
             fig = go.Figure(data=heatmap_data)
@@ -135,53 +195,138 @@ class VisualizationEngine:
             # Add annotations for each cell to ensure text is visible
             annotations = []
             for i, archetype in enumerate(archetypes):
-                for j, trait in enumerate(trait_names):
+                for j, trait in enumerate(trait_display_names):
                     annotations.append(
                         dict(
                             x=j, y=i,
                             text=text_matrix[i][j],
                             showarrow=False,
-                            font=dict(color="black", size=12, family="Arial, sans-serif"),
+                            font=dict(color="black", size=7, family="Arial, sans-serif", weight="bold"),  # Smaller annotation text to fit
                             xref="x", yref="y"
                         )
                     )
             
-            # Add highlighting for detected archetype
+            # Add highlighting for key traits in each archetype
+            for i, archetype_display in enumerate(archetypes):
+                # Map display name (with line breaks) to full name for key trait lookup
+                archetype_full = archetype_display_to_full.get(archetype_display, archetype_display)
+                key_traits = archetype_key_traits.get(archetype_full, [])
+                for j, trait_display_name in enumerate(trait_display_names):
+                    # Map display name back to full name for key trait matching
+                    trait_name = trait_names[j]
+                    # Map heatmap trait name to archetype trait name
+                    archetype_trait_name = heatmap_to_archetype_mapping.get(trait_name, trait_name)
+                    # Check if this trait is a key trait for this archetype
+                    if archetype_trait_name in key_traits:
+                        # Add a border/shape to highlight key trait cells
+                        fig.add_shape(
+                            type="rect",
+                            x0=j-0.5, x1=j+0.5,
+                            y0=i-0.5, y1=i+0.5,
+                            line=dict(color="#FF6B35", width=3),  # Orange-red border for key traits
+                            fillcolor="rgba(0,0,0,0)",
+                            layer="above"
+                        )
+                        # Add a star annotation to indicate key trait
+                        annotations.append(
+                            dict(
+                                x=j, y=i,
+                                text="★",
+                                showarrow=False,
+                                font=dict(color="#FF6B35", size=8, family="Arial, sans-serif"),  # Smaller star for compact cells
+                                xref="x", yref="y",
+                                xanchor="left",
+                                yanchor="top"
+                            )
+                        )
+            
+            # Add highlighting for detected archetype (thicker border)
             detected_archetype = profile_data.get('archetype_name', 'Resilient Leadership')
-            if detected_archetype in archetypes:
-                resilient_leadership_index = archetypes.index(detected_archetype)
-                for j in range(len(trait_names)):
+            # Map full archetype name to display name with line breaks
+            detected_display = None
+            for display_name, full_name in archetype_display_to_full.items():
+                if full_name == detected_archetype:
+                    detected_display = display_name
+                    break
+            if detected_display and detected_display in archetypes:
+                detected_index = archetypes.index(detected_display)
+                for j in range(len(trait_display_names)):
                     fig.add_shape(
                         type="rect",
                         x0=j-0.5, x1=j+0.5,
-                        y0=resilient_leadership_index-0.5, y1=resilient_leadership_index+0.5,
-                        line=dict(color="black", width=3),
+                        y0=detected_index-0.5, y1=detected_index+0.5,
+                        line=dict(color="#570F27", width=4),  # Dark burgundy for detected archetype row
                         fillcolor="rgba(0,0,0,0)",
                         layer="above"
                     )
             
             fig.update_layout(
                 title=dict(
-                    text=f"Trait Scores by Archetype<br><sub>Detected: {detected_archetype} (Highlighted)</sub>",
-                    font=dict(size=14, color="#2c3e50"), x=0.5
+                    text=f"Trait Scores by Archetype<br><sub style='font-size: 9px; line-height: 1.3;'>Detected: {detected_archetype} (Dark Border) | ★ = Key Traits for Each Archetype</sub>",
+                    font=dict(size=13, color="#2c3e50", family="Arial, sans-serif"),  # Smaller title
+                    x=0.5,  # Center horizontally
+                    xanchor='center',  # Center anchor
+                    y=1.0,  # Position at absolute top
+                    yref='paper',  # Reference to paper coordinates
+                    pad=dict(t=0, b=70)  # Reduced bottom padding for more compact layout
                 ),
-                xaxis=dict(title="Personality Traits", tickfont=dict(size=9), 
-                          title_font=dict(size=11), tickangle=45),
-                yaxis=dict(title="Entrepreneurial Archetypes", tickfont=dict(size=9), 
-                          title_font=dict(size=11)),
+                xaxis=dict(
+                    title="Personality Traits", 
+                    tickfont=dict(size=6, weight='bold', family="Arial, sans-serif"),  # Smaller font to fit 17 traits
+                    title_font=dict(size=10, weight='bold', family="Arial, sans-serif"),  # Smaller title font
+                    tickangle=-60,  # Steeper angle for more compact labels
+                    tickmode='linear',
+                    dtick=1,  # Show all ticks
+                    side='bottom',
+                    showgrid=False,
+                    zeroline=False,
+                    automargin=True,  # Auto-adjust margins to prevent truncation
+                    ticklabeloverflow='allow',  # Allow labels to extend if needed
+                    ticklabelposition='outside',  # Place labels outside plot area
+                    anchor='free',  # Allow positioning
+                    position=0.0  # Position at bottom
+                ),
+                yaxis=dict(
+                    title="Entrepreneurial Archetypes", 
+                    tickfont=dict(size=8, weight='bold'),  # Smaller font for compactness
+                    title_font=dict(size=10, weight='bold'),  # Smaller title font
+                    showgrid=False,  # Remove grid lines (we have cell borders)
+                    zeroline=False,
+                    domain=[0.0, 0.85],  # Start y-axis lower (0.85) to leave more space for title and subtitle above
+                    tickmode='array',  # Use array mode for custom labels
+                    tickvals=list(range(len(archetypes))),  # Position ticks at each archetype
+                    ticktext=archetypes  # Use archetypes with line breaks
+                ),
                 font=dict(family="Arial, sans-serif"),
-                margin=dict(l=80, r=40, t=60, b=80),
-                height=400, width=800,
-                paper_bgcolor="#FEFEFE", plot_bgcolor="#FAFAFA",
-                autosize=True,
-                annotations=annotations
+                margin=dict(l=40, r=70, t=170, b=100),  # Compact margins
+                height=500, width=1110,  # Balanced width - fits well and readable
+                paper_bgcolor="#FEFEFE", plot_bgcolor="#E5E5E5",  # Slightly darker background to show borders
+                autosize=True,  # Enable autosize for responsive behavior
+                annotations=annotations,
+                # Reduce spacing to make cells more compact
+                bargap=0,
+                bargroupgap=0
             )
             
-            return fig.to_html(include_plotlyjs=False, div_id="archetype-heatmap", full_html=False)
+            # Update xaxis domain to use more width, bringing colorbar closer
+            fig.update_xaxes(domain=[0, 0.75])  # Use 75% of width, leaving 25% on right for labels and colorbar
+            
+            # Make the plot responsive with proper config
+            config = {
+                'responsive': True,
+                'displayModeBar': False,  # Hide toolbar for cleaner look
+                'staticPlot': False,
+                'autosizable': True  # Allow auto-sizing
+            }
+            
+            return fig.to_html(include_plotlyjs=False, div_id="archetype-heatmap", full_html=False, config=config)
             
         except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
             logger.error(f"Error creating archetype heatmap: {e}")
-            return '<div>Correlation heatmap unavailable</div>'
+            logger.error(f"Traceback: {error_trace}")
+            return f'<div>Correlation heatmap unavailable: {str(e)}</div>'
     
     def create_trait_radar_chart(self, trait_scores: Dict[str, float]) -> str:
         """Create radar chart for trait scores"""
@@ -213,7 +358,17 @@ class VisualizationEngine:
                 title="Trait Profile Radar Chart",
                 font=dict(family="Arial, sans-serif"),
                 height=500,
-                width=600
+                width=600,
+                annotations=[
+                    dict(
+                        text="*Higher social orientation is extroversion, lower social orientation is introversion",
+                        xref="paper", yref="paper",
+                        x=0.5, y=-0.15,
+                        showarrow=False,
+                        font=dict(size=10, color="#666666"),
+                        align="center"
+                    )
+                ]
             )
             
             return fig.to_html(include_plotlyjs=False, div_id="trait-radar", full_html=False)
@@ -317,8 +472,10 @@ class VisualizationEngine:
     def create_top_trait_gauges(self, trait_scores: Dict[str, float]) -> str:
         """Create gauges for top 3 traits"""
         try:
-            # Get top 3 traits
-            sorted_traits = sorted(trait_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+            # Filter out IN (Social Orientation) from trait scores
+            filtered_scores = {k: v for k, v in trait_scores.items() if k != 'IN'}
+            # Get top 3 traits (excluding IN)
+            sorted_traits = sorted(filtered_scores.items(), key=lambda x: x[1], reverse=True)[:3]
             
             fig = make_subplots(
                 rows=1, cols=3,
@@ -398,10 +555,12 @@ class VisualizationEngine:
     def create_growth_opportunities_gauges(self, trait_scores: Dict[str, float]) -> str:
         """Create gauge charts for growth opportunities (bottom 3 traits)"""
         try:
+            # Filter out IN (Social Orientation) from trait scores
+            filtered_scores = {k: v for k, v in trait_scores.items() if k != 'IN'}
             # Get bottom 3 traits (lowest scores) - exclude top 3 to avoid duplication
-            sorted_traits = sorted(trait_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
+            sorted_traits = sorted(filtered_scores.items(), key=lambda x: x[1])  # Sort lowest to highest
             # Get the actual bottom 3 traits with lowest scores, but exclude any that are in top 3
-            top_3_traits = sorted(trait_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+            top_3_traits = sorted(filtered_scores.items(), key=lambda x: x[1], reverse=True)[:3]
             top_3_codes = [trait[0] for trait in top_3_traits]
             
             # Get the bottom 3 traits from the lowest scores, excluding top 3

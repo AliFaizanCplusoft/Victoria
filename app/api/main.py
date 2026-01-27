@@ -271,9 +271,25 @@ async def generate_report_from_csv_data(request: Request):
         # Convert CSV content to the expected format using utility function
         processed_csv = convert_csv_to_pipeline_format(csv_content)
         
+        # Validate that we have data
+        if processed_csv.empty:
+            raise HTTPException(
+                status_code=400,
+                detail="CSV file is empty or could not be parsed"
+            )
+        
+        if len(processed_csv) <= person_index:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Person index {person_index} is out of bounds. CSV has {len(processed_csv)} row(s). Use index 0 to {len(processed_csv)-1}."
+            )
+        
+        logger.info(f"CSV processed successfully: {len(processed_csv)} rows, {len(processed_csv.columns)} columns")
+        logger.info(f"Processing person at index: {person_index}")
+        
         # Save to temporary CSV file
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w') as tmp_file:
-            processed_csv.to_csv(tmp_file.name, index=False)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w', encoding='utf-8') as tmp_file:
+            processed_csv.to_csv(tmp_file.name, index=False, encoding='utf-8')
             tmp_file_path = tmp_file.name
         
         try:
@@ -335,9 +351,25 @@ async def generate_report_from_csv_data_json(request: Request):
         # Convert CSV content to the expected format using utility function
         processed_csv = convert_csv_to_pipeline_format(csv_content)
         
+        # Validate that we have data
+        if processed_csv.empty:
+            raise HTTPException(
+                status_code=400,
+                detail="CSV file is empty or could not be parsed"
+            )
+        
+        if len(processed_csv) <= person_index:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Person index {person_index} is out of bounds. CSV has {len(processed_csv)} row(s). Use index 0 to {len(processed_csv)-1}."
+            )
+        
+        logger.info(f"CSV processed successfully: {len(processed_csv)} rows, {len(processed_csv.columns)} columns")
+        logger.info(f"Processing person at index: {person_index}")
+        
         # Save to temporary CSV file
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w') as tmp_file:
-            processed_csv.to_csv(tmp_file.name, index=False)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w', encoding='utf-8') as tmp_file:
+            processed_csv.to_csv(tmp_file.name, index=False, encoding='utf-8')
             tmp_file_path = tmp_file.name
         
         try:
