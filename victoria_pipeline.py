@@ -166,14 +166,30 @@ class VetriaPipeline:
             mapped_data = self.data_processor._map_responses(raw_data)
             logger.info("Response mapping completed")
             
-            # Step 3: Calculate Rasch measures
-            logger.info("Step 3: Calculating Rasch measures...")
+            # Step 3: Calculate Rasch measures using genuine RaschPy RSM
+            logger.info("Step 3: Calculating Rasch measures using RaschPy RSM...")
             rasch_data = self.data_processor._calculate_rasch_measures(mapped_data)
             logger.info("Rasch measures calculated")
             
-            # Step 4: Calculate trait scores
-            logger.info("Step 4: Calculating trait scores...")
-            trait_profiles = self.trait_scorer.calculate_trait_scores(raw_data)
+            # Extract Rasch results for trait scoring
+            rasch_results = {
+                'item_difficulties': rasch_data.get('item_difficulties', {}),
+                'person_abilities': rasch_data.get('person_abilities', {}),
+                'fit_statistics': rasch_data.get('fit_statistics', {})
+            }
+            
+            if rasch_results['item_difficulties'] and rasch_results['person_abilities']:
+                logger.info(f"Rasch analysis completed: {len(rasch_results['item_difficulties'])} items, "
+                          f"{len(rasch_results['person_abilities'])} persons")
+            else:
+                logger.warning("Rasch analysis incomplete, falling back to arithmetic mean")
+            
+            # Step 4: Calculate trait scores using Rasch measures
+            logger.info("Step 4: Calculating trait scores using Rasch measures...")
+            trait_profiles = self.trait_scorer.calculate_trait_scores(
+                raw_data, 
+                rasch_results=rasch_results
+            )
             person_id = f"person_{person_index}"
             
             if person_id not in trait_profiles:

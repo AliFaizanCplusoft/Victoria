@@ -1,6 +1,6 @@
 """
 Data Processor - Step 1-3: Raw Data to Rasch Measures
-Handles response mapping and Rasch processing
+Handles response mapping and Rasch processing using genuine RaschPy RSM
 """
 
 import pandas as pd
@@ -10,6 +10,15 @@ import logging
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# Import Rasch processing components
+try:
+    from ..processing.response_converter import ResponseConverter
+    from ..processing.rasch_processor import RaschPyProcessor
+except ImportError:
+    logger.warning("Could not import Rasch processing components")
+    ResponseConverter = None
+    RaschPyProcessor = None
 
 class DataProcessor:
     """
@@ -107,9 +116,135 @@ class DataProcessor:
     
     def _calculate_rasch_measures(self, df: pd.DataFrame) -> Dict[str, Any]:
         """
-        Calculate Rasch measures for each person and question
-        Simplified Rasch analysis for psychometric scaling
+        Calculate Rasch measures using genuine RaschPy RSM analysis
+        
+        Args:
+            df: DataFrame with mapped numeric responses (0.0-1.0 float scale)
+            
+        Returns:
+            Dictionary containing:
+            - item_difficulties: Dict mapping item names to difficulty estimates
+            - person_abilities: Dict mapping person IDs to ability estimates (logit scale)
+            - fit_statistics: Dict with fit statistics
+            - person_measures: Legacy format for backward compatibility
         """
+        logger.info("Calculating Rasch measures using RaschPy RSM...")
+        
+        # Identify assessment columns (exclude metadata)
+        assessment_columns = self._identify_assessment_columns(df)
+        
+        if not assessment_columns:
+            logger.warning("No assessment columns identified, using fallback method")
+            return self._fallback_rasch_measures(df)
+        
+        # Step 1: Convert float responses to integer scores (0-4)
+        if ResponseConverter is None:
+            logger.warning("ResponseConverter not available, using fallback")
+            return self._fallback_rasch_measures(df)
+        
+        response_converter = ResponseConverter(reverse_items=self.reverse_items)
+        integer_df = response_converter.convert_to_rasch_integers(
+            df, 
+            assessment_columns, 
+            reverse_items=self.reverse_items
+        )
+        
+        # Step 2: Prepare data for RaschPy (items as rows, persons as columns)
+        if RaschPyProcessor is None:
+            logger.warning("RaschPyProcessor not available, using fallback")
+            return self._fallback_rasch_measures(df)
+        
+        rasch_processor = RaschPyProcessor(max_score=4)
+        prepared_data, person_ids = rasch_processor.prepare_data_for_rasch(integer_df, assessment_columns)
+        
+        # Step 3: Run RSM analysis
+        rasch_results = rasch_processor.run_rsm_analysis(
+            prepared_data,
+            item_names=assessment_columns,
+            person_ids=person_ids
+        )
+        
+        # Step 4: Create legacy format for backward compatibility
+        person_measures = {}
+        for person_idx in range(len(df)):
+            person_id = f"person_{person_idx}"
+            person_ability = rasch_results['person_abilities'].get(person_id, 0.0)
+            
+            # Create item-level measures using person ability and item difficulties
+            person_item_measures = {}
+            for item_name in assessment_columns:
+                item_difficulty = rasch_results['item_difficulties'].get(item_name, 0.0)
+                # Rasch measure = person ability - item difficulty
+                measure = person_ability - item_difficulty
+                person_item_measures[item_name] = measure
+            
+            person_measures[person_id] = person_item_measures
+        
+        # Return structured results
+        return {
+            'item_difficulties': rasch_results['item_difficulties'],
+            'person_abilities': rasch_results['person_abilities'],
+            'fit_statistics': rasch_results.get('fit_statistics', {}),
+            'person_measures': person_measures,  # Legacy format
+            'rasch_processor': rasch_processor,  # Keep processor for later use
+            'assessment_columns': assessment_columns
+        }
+    
+    def _identify_assessment_columns(self, df: pd.DataFrame) -> List[str]:
+        """
+        Identify columns containing assessment responses
+        
+        Args:
+            df: DataFrame to analyze
+            
+        Returns:
+            List of assessment column names
+        """
+        assessment_columns = []
+        
+        # Skip metadata columns
+        skip_columns = {
+            'Please enter your prolific ID', 
+            'In what country do you currently reside?',
+            'Are you interested in entrepreneurship?', 
+            'Thanks in advance for confirming your email address.',
+            'Select the statement that resonates with you the most.',
+            'Response Type', 
+            'Start Date (UTC)', 
+            'Submit Date (UTC)', 
+            'Network ID', 
+            'Tags', 
+            'Ending',
+            'First name',
+            'Last name',
+            'Email',
+            'email'
+        }
+        
+        for col in df.columns:
+            # Skip known metadata columns
+            if col in skip_columns:
+                continue
+            
+            # Check if column contains numeric responses (assessment data)
+            if df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                # Check if values are in expected range (0.0-1.0 or 0-4)
+                sample_values = df[col].dropna()
+                if len(sample_values) > 0:
+                    min_val = sample_values.min()
+                    max_val = sample_values.max()
+                    if 0 <= min_val <= max_val <= 4:
+                        assessment_columns.append(col)
+        
+        logger.info(f"Identified {len(assessment_columns)} assessment columns")
+        return assessment_columns
+    
+    def _fallback_rasch_measures(self, df: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Fallback method when RaschPy is not available
+        Uses simplified Rasch measures (legacy implementation)
+        """
+        logger.warning("Using fallback Rasch measures calculation")
         rasch_data = {}
         
         for person_idx in range(len(df)):
@@ -152,4 +287,11 @@ class DataProcessor:
             
             rasch_data[person_id] = person_measures
         
-        return rasch_data
+        return {
+            'item_difficulties': {},
+            'person_abilities': {},
+            'fit_statistics': {},
+            'person_measures': rasch_data,
+            'rasch_processor': None,
+            'assessment_columns': []
+        }

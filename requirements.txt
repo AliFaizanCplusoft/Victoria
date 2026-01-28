@@ -1,0 +1,36 @@
+# Victoria Project Requirements
+# Core dependencies
+
+# Data processing
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Rasch Analysis
+# Install RaschPy from GitHub:
+# pip install git+https://github.com/MarkElliott999/RaschPy.git
+# Or if available via PyPI:
+# raschpy>=1.0.0
+
+# Web framework
+fastapi>=0.100.0
+uvicorn>=0.23.0
+streamlit>=1.25.0
+
+# Template engine
+jinja2>=3.1.0
+
+# OpenAI API (for dynamic content generation)
+openai>=1.0.0
+
+# Visualization
+plotly>=5.14.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Logging (built-in, but ensure compatibility)
+# Standard library
+
+# Optional: For enhanced psychometric analysis
+# scipy>=1.10.0  # For advanced statistical functions
+# scikit-learn>=1.3.0  # For additional analysis tools
